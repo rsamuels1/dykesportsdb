@@ -199,7 +199,7 @@ def club_detail(club_id):
     club = cur.fetchone()
     if club is None:
         return "Club not found", 404
-    return render_template("club_detail.html", club=club)
+    return render_template("club_detail.html", club=club, sport_emoji=SPORT_EMOJI)
 
 
 @app.route("/submit", methods=["GET", "POST"])
