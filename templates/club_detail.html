@@ -68,6 +68,12 @@
                 <span class="meta-key">Season</span>
                 <span class="meta-val">{{ club['season'] }}</span>
             </div>
+            {% if club['weekday'] %}
+            <div class="meta-row">
+                <span class="meta-key">Day</span>
+                <span class="meta-val">{{ club['weekday'] }}</span>
+            </div>
+            {% endif %}
             {% if club['instagram'] %}
             <div class="meta-row">
                 <span class="meta-key">Instagram</span>

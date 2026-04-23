@@ -153,8 +153,10 @@ def sports_database():
     sports = [r["sport"] for r in cur.fetchall()]
     cur.execute("SELECT DISTINCT city FROM clubs WHERE status = 'approved' AND city IS NOT NULL ORDER BY city")
     cities = [r["city"] for r in cur.fetchall()]
+    cur.execute("SELECT DISTINCT weekday FROM clubs WHERE status = 'approved' AND weekday IS NOT NULL ORDER BY weekday")
+    weekdays = [r["weekday"] for r in cur.fetchall()]
     return render_template("sports_database.html", clubs=clubs, sports=sports, cities=cities,
-                           skill_levels=SKILL_LEVELS, seasons=SEASONS)
+                           weekdays=weekdays, skill_levels=SKILL_LEVELS, seasons=SEASONS)
 
 
 @app.route("/sports-database/<int:club_id>")

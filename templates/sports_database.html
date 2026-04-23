@@ -65,6 +65,15 @@
         <button class="fbtn fcity" data-filter="playtype" data-val="Pick-Up">Pick-Up</button>
         <button class="fbtn fcity" data-filter="playtype" data-val="Both">Both</button>
     </div>
+    {% if weekdays %}
+    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <span class="filter-label">Day</span>
+        <button class="fbtn fcity on" data-filter="weekday" data-val="all">All</button>
+        {% for day in weekdays %}
+        <button class="fbtn fcity" data-filter="weekday" data-val="{{ day }}">{{ day }}</button>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
         <span class="filter-label">Skill Level</span>
         <button class="fbtn fcity on" data-filter="skill" data-val="all">All</button>
@@ -96,6 +105,7 @@
            data-playtype="{{ club['play_type'] or '' }}"
            data-skill="{{ club['skill_level'] }}"
            data-season="{{ club['season'] }}"
+           data-weekday="{{ club['weekday'] or '' }}"
            data-search="{{ [club['club_name'], club['sport'], club['skill_level'], club['season'], club['play_type'] or '', club['notes'] or ''] | join(' ') | lower }}">
             <div class="card-img sports-card-img">
                 {% if club['photo_url'] %}
@@ -156,6 +166,7 @@
 
     let activeSport    = 'all';
     let activeCity     = 'all';
+    let activeWeekday  = 'all';
     let activePlaytype = 'all';
     let activeSkill    = 'all';
     let activeSeason   = 'all';
@@ -166,11 +177,12 @@
         cards.forEach(card => {
             const sportMatch    = activeSport    === 'all' || card.dataset.sport    === activeSport;
             const cityMatch     = activeCity     === 'all' || card.dataset.city     === activeCity;
+            const weekdayMatch  = activeWeekday  === 'all' || card.dataset.weekday  === activeWeekday;
             const playtypeMatch = activePlaytype === 'all' || card.dataset.playtype === activePlaytype;
             const skillMatch    = activeSkill    === 'all' || card.dataset.skill     === activeSkill;
             const seasonMatch   = activeSeason   === 'all' || card.dataset.season    === activeSeason;
             const searchMatch   = !searchQuery   || card.dataset.search.includes(searchQuery);
-            const show = sportMatch && cityMatch && playtypeMatch && skillMatch && seasonMatch && searchMatch;
+            const show = sportMatch && cityMatch && weekdayMatch && playtypeMatch && skillMatch && seasonMatch && searchMatch;
             card.style.display = show ? '' : 'none';
             if (show) visible++;
         });
@@ -192,6 +204,15 @@
             document.querySelectorAll('[data-filter="city"]').forEach(b => b.classList.remove('on'));
             btn.classList.add('on');
             activeCity = btn.dataset.val;
+            apply();
+        });
+    });
+
+    document.querySelectorAll('[data-filter="weekday"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-filter="weekday"]').forEach(b => b.classList.remove('on'));
+            btn.classList.add('on');
+            activeWeekday = btn.dataset.val;
             apply();
         });
     });
