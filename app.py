@@ -211,10 +211,16 @@ def submit():
     if request.method == "POST":
         club_name   = request.form.get("club_name", "").strip()
         sport       = request.form.get("sport", "").strip()
+        city        = request.form.get("city", "").strip() or None
         skill_level = request.form.get("skill_level", "").strip()
         season      = request.form.get("season", "").strip()
+        play_type   = request.form.get("play_type", "").strip() or None
+        weekday     = request.form.get("weekday", "").strip() or None
+        cost        = request.form.get("cost", "").strip() or None
+        contact     = request.form.get("contact", "").strip() or None
         how_to_join = request.form.get("how_to_join", "").strip() or None
         instagram   = request.form.get("instagram", "").strip().lstrip("@") or None
+        website     = request.form.get("website", "").strip() or None
         notes       = request.form.get("notes", "").strip() or None
 
         if not all([club_name, sport, skill_level, season]):
@@ -237,9 +243,9 @@ def submit():
                 cur = db.cursor()
                 cur.execute(
                     """INSERT INTO clubs
-                       (club_name, sport, skill_level, season, how_to_join, instagram, notes, photo_url, status)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
-                    [club_name, sport, skill_level, season, how_to_join, instagram, notes, photo_url],
+                       (club_name, sport, city, skill_level, season, play_type, weekday, cost, contact, how_to_join, instagram, website, notes, photo_url, status)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
+                    [club_name, sport, city, skill_level, season, play_type, weekday, cost, contact, how_to_join, instagram, website, notes, photo_url],
                 )
                 db.commit()
                 send_submission_email(club_name, sport)

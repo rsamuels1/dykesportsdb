@@ -81,6 +81,34 @@
         </div>
 
         <div class="form-section">
+            <label class="form-label" for="city">City</label>
+            <input class="form-input" type="text" id="city" name="city"
+                   placeholder="Portland, Seattle, etc." value="{{ request.form.get('city', '') }}">
+            <div class="form-hint">Optional — the main city where the club plays.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="play_type">Play Type</label>
+            <input class="form-input" type="text" id="play_type" name="play_type"
+                   placeholder="League, Pick-Up, Both" value="{{ request.form.get('play_type', '') }}">
+            <div class="form-hint">Optional — League, Pick-Up, or Both.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="weekday">Meeting Day</label>
+            <input class="form-input" type="text" id="weekday" name="weekday"
+                   placeholder="Saturdays, Tuesdays & Thursdays, etc." value="{{ request.form.get('weekday', '') }}">
+            <div class="form-hint">Optional — when does the club typically meet?</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="cost">Cost</label>
+            <input class="form-input" type="text" id="cost" name="cost"
+                   placeholder="Free, $10/game, etc." value="{{ request.form.get('cost', '') }}">
+            <div class="form-hint">Optional — cost to play per game or season.</div>
+        </div>
+
+        <div class="form-section">
             <span class="form-label">Skill Level</span>
             <div class="option-grid">
                 {% for level in skill_levels %}
@@ -118,6 +146,20 @@
             <input class="form-input" type="text" id="how_to_join" name="how_to_join"
                    placeholder="https://… or DM on Instagram" value="{{ request.form.get('how_to_join', '') }}">
             <div class="form-hint">Optional — a URL or brief instructions.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="website">Website</label>
+            <input class="form-input" type="url" id="website" name="website"
+                   placeholder="https://…" value="{{ request.form.get('website', '') }}">
+            <div class="form-hint">Optional — link to the club's website.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="contact">Contact Info</label>
+            <input class="form-input" type="text" id="contact" name="contact"
+                   placeholder="Email, phone, or message" value="{{ request.form.get('contact', '') }}">
+            <div class="form-hint">Optional — how to reach the club organizer.</div>
         </div>
 
         <div class="form-section">
