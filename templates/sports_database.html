@@ -107,10 +107,15 @@
                 {% endif %}
             </div>
             <div class="card-body">
-                <div class="sport-badge">{{ club['sport'] }}</div>
+                {% if club['play_type'] %}
+                <div class="sport-badge">{{ club['play_type'] }}</div>
+                {% endif %}
                 <div class="card-name">{{ club['club_name'] }}</div>
                 <hr class="card-sep">
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; font-size:9px; letter-spacing:2px; text-transform:uppercase;">
+                    <span style="border:1px solid var(--afaint); color:rgba(255,255,255,0.55); padding:2px 8px;">
+                        {{ club['sport'] }}
+                    </span>
                     <span style="border:1px solid var(--afaint); color:rgba(255,255,255,0.55); padding:2px 8px;">
                         {{ club['skill_level'] }}
                     </span>
