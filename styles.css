@@ -446,6 +446,33 @@ body.page-application h1 {
     border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 
+/* --- CLUB LIST VIEW ------------------------------- */
+.club-list { display: flex; flex-direction: column; gap: 2px; }
+.club-row {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--bg2); border: 1px solid var(--afaint);
+    padding: 14px 16px; text-decoration: none; color: var(--w);
+    transition: border-color 0.15s, background 0.15s;
+}
+.club-row:hover { border-color: #444; background: #141820; }
+.club-row-emoji { font-size: 28px; flex-shrink: 0; width: 40px; text-align: center; line-height: 1; }
+.club-row-body { flex: 1; min-width: 0; }
+.club-row-name { font-family: var(--fhead); font-size: 18px; letter-spacing: 1.5px; line-height: 1; margin-bottom: 6px; color: var(--w); }
+.club-row-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.row-tag {
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    border: 1px solid var(--afaint); color: rgba(255,255,255,0.5);
+    padding: 2px 7px;
+}
+.row-tag-type { border-color: var(--amber); color: var(--amber); }
+.row-tag-city { border-color: rgba(190,255,0,0.4); color: var(--green); }
+.club-row-arrow { font-size: 16px; color: var(--adim); flex-shrink: 0; transition: color 0.15s, transform 0.15s; }
+.club-row:hover .club-row-arrow { color: var(--amber); transform: translateX(3px); }
+@media (max-width: 500px) {
+    .club-row-emoji { font-size: 22px; width: 30px; }
+    .club-row-name  { font-size: 15px; }
+}
+
 /* ================================================
    CONTRIBUTOR PAGE
    ================================================ */

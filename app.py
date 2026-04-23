@@ -23,6 +23,35 @@ UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "img", "uploads")
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "gif"}
 
 SKILL_LEVELS = ["Beginner", "Intermediate", "Competitive", "All Levels"]
+
+SPORT_EMOJI = {
+    "soccer":          "⚽",
+    "flag football":   "🏈",
+    "football":        "🏈",
+    "basketball":      "🏀",
+    "ice hockey":      "🏒",
+    "hockey":          "🏒",
+    "softball":        "🥎",
+    "baseball":        "⚾",
+    "volleyball":      "🏐",
+    "tennis":          "🎾",
+    "swimming":        "🏊",
+    "running":         "🏃",
+    "cycling":         "🚴",
+    "bowling":         "🎳",
+    "golf":            "⛳",
+    "wrestling":       "🤼",
+    "boxing":          "🥊",
+    "yoga":            "🧘",
+    "climbing":        "🧗",
+    "roller derby":    "🛼",
+    "kickball":        "🏅",
+    "ultimate frisbee":"🥏",
+    "frisbee":         "🥏",
+    "lacrosse":        "🥍",
+    "rugby":           "🏉",
+    "pickleball":      "🏓",
+}
 SEASONS      = ["Year-Round", "Spring", "Summer", "Fall", "Winter"]
 
 
@@ -156,7 +185,8 @@ def sports_database():
     cur.execute("SELECT DISTINCT weekday FROM clubs WHERE status = 'approved' AND weekday IS NOT NULL ORDER BY weekday")
     weekdays = [r["weekday"] for r in cur.fetchall()]
     return render_template("sports_database.html", clubs=clubs, sports=sports, cities=cities,
-                           weekdays=weekdays, skill_levels=SKILL_LEVELS, seasons=SEASONS)
+                           weekdays=weekdays, skill_levels=SKILL_LEVELS, seasons=SEASONS,
+                           sport_emoji=SPORT_EMOJI)
 
 
 @app.route("/sports-database/<int:club_id>")

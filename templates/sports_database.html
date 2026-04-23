@@ -95,55 +95,35 @@
     <div class="result-count" id="resultCount">{{ clubs|length }} club{{ 's' if clubs|length != 1 else '' }}</div>
 
     {% if clubs %}
-    <div class="grid" id="clubGrid">
+    <div class="club-list" id="clubGrid">
         {% for club in clubs %}
+        {% set emoji = sport_emoji.get(club['sport'].lower(), '🏅') %}
         <a href="/sports-database/{{ club['id'] }}"
-           class="card"
-           style="text-decoration:none;color:inherit;display:block;"
+           class="club-row"
            data-sport="{{ club['sport'] }}"
            data-city="{{ club['city'] or '' }}"
            data-playtype="{{ club['play_type'] or '' }}"
            data-skill="{{ club['skill_level'] }}"
            data-season="{{ club['season'] }}"
            data-weekday="{{ club['weekday'] or '' }}"
-           data-search="{{ [club['club_name'], club['sport'], club['skill_level'], club['season'], club['play_type'] or '', club['notes'] or ''] | join(' ') | lower }}">
-            <div class="card-img sports-card-img">
-                {% if club['photo_url'] %}
-                <img src="{{ club['photo_url'] if club['photo_url'].startswith('http') else '/' + club['photo_url'] }}" alt="{{ club['club_name'] }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">
-                {% else %}
-                <div style="width:100%;height:100%;background:var(--bg2);display:flex;align-items:center;justify-content:center;">
-                    <span style="font-size:48px;">🏅</span>
-                </div>
-                {% endif %}
-            </div>
-            <div class="card-body">
-                {% if club['play_type'] %}
-                <div class="sport-badge">{{ club['play_type'] }}</div>
-                {% endif %}
-                <div class="card-name">{{ club['club_name'] }}</div>
-                <hr class="card-sep">
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; font-size:9px; letter-spacing:2px; text-transform:uppercase;">
-                    <span style="border:1px solid var(--afaint); color:rgba(255,255,255,0.55); padding:2px 8px;">
-                        {{ club['sport'] }}
-                    </span>
-                    <span style="border:1px solid var(--afaint); color:rgba(255,255,255,0.55); padding:2px 8px;">
-                        {{ club['skill_level'] }}
-                    </span>
-                    <span style="border:1px solid var(--afaint); color:rgba(255,255,255,0.55); padding:2px 8px;">
-                        {{ club['season'] }}
-                    </span>
-                </div>
-                {% if club['notes'] %}
-                <div class="card-text">{{ club['notes'] }}</div>
-                {% endif %}
-                <div class="card-foot">
-                    <span class="card-date">{{ club['created_at'].strftime('%Y-%m-%d') if club['created_at'] else '' }}</span>
+           data-search="{{ [club['club_name'], club['sport'], club['skill_level'], club['season'], club['play_type'] or '', club['weekday'] or '', club['notes'] or ''] | join(' ') | lower }}">
+            <div class="club-row-emoji">{{ emoji }}</div>
+            <div class="club-row-body">
+                <div class="club-row-name">{{ club['club_name'] }}</div>
+                <div class="club-row-tags">
+                    {% if club['play_type'] %}<span class="row-tag row-tag-type">{{ club['play_type'] }}</span>{% endif %}
+                    <span class="row-tag">{{ club['sport'] }}</span>
+                    <span class="row-tag">{{ club['skill_level'] }}</span>
+                    {% if club['weekday'] %}<span class="row-tag">{{ club['weekday'] }}</span>{% endif %}
+                    <span class="row-tag">{{ club['season'] }}</span>
+                    {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
                 </div>
             </div>
+            <div class="club-row-arrow">→</div>
         </a>
         {% endfor %}
     </div>
-    <div class="no-results" id="noResults">No clubs match your search</div>
+    <div class="no-results" id="noResults">No clubs match your filters</div>
     {% else %}
     <div style="padding:80px 20px; text-align:center;">
         <div style="font-size:40px; margin-bottom:16px;">🏅</div>
@@ -159,7 +139,7 @@
 {% if clubs %}
 <script>
 (function () {
-    const cards     = Array.from(document.querySelectorAll('#clubGrid .card'));
+    const cards     = Array.from(document.querySelectorAll('#clubGrid .club-row'));
     const countEl   = document.getElementById('resultCount');
     const noResults = document.getElementById('noResults');
     const searchEl  = document.getElementById('searchInput');
