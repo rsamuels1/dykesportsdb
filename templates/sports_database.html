@@ -50,6 +50,13 @@
         {% endfor %}
     </div>
     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <span class="filter-label">Type</span>
+        <button class="fbtn fcity on" data-filter="playtype" data-val="all">All</button>
+        <button class="fbtn fcity" data-filter="playtype" data-val="League">League</button>
+        <button class="fbtn fcity" data-filter="playtype" data-val="Pick-Up">Pick-Up</button>
+        <button class="fbtn fcity" data-filter="playtype" data-val="Both">Both</button>
+    </div>
+    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
         <span class="filter-label">Skill Level</span>
         <button class="fbtn fcity on" data-filter="skill" data-val="all">All</button>
         {% for level in skill_levels %}
@@ -76,9 +83,10 @@
            class="card"
            style="text-decoration:none;color:inherit;display:block;"
            data-sport="{{ club['sport'] }}"
+           data-playtype="{{ club['play_type'] or '' }}"
            data-skill="{{ club['skill_level'] }}"
            data-season="{{ club['season'] }}"
-           data-search="{{ [club['club_name'], club['sport'], club['skill_level'], club['season'], club['notes'] or ''] | join(' ') | lower }}">
+           data-search="{{ [club['club_name'], club['sport'], club['skill_level'], club['season'], club['play_type'] or '', club['notes'] or ''] | join(' ') | lower }}">
             <div class="card-img sports-card-img">
                 {% if club['photo_url'] %}
                 <img src="{{ club['photo_url'] if club['photo_url'].startswith('http') else '/' + club['photo_url'] }}" alt="{{ club['club_name'] }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">
@@ -131,19 +139,21 @@
     const noResults = document.getElementById('noResults');
     const searchEl  = document.getElementById('searchInput');
 
-    let activeSport  = 'all';
-    let activeSkill  = 'all';
-    let activeSeason = 'all';
-    let searchQuery  = '';
+    let activeSport    = 'all';
+    let activePlaytype = 'all';
+    let activeSkill    = 'all';
+    let activeSeason   = 'all';
+    let searchQuery    = '';
 
     function apply() {
         let visible = 0;
         cards.forEach(card => {
-            const sportMatch  = activeSport  === 'all' || card.dataset.sport  === activeSport;
-            const skillMatch  = activeSkill  === 'all' || card.dataset.skill  === activeSkill;
-            const seasonMatch = activeSeason === 'all' || card.dataset.season === activeSeason;
-            const searchMatch = !searchQuery || card.dataset.search.includes(searchQuery);
-            const show = sportMatch && skillMatch && seasonMatch && searchMatch;
+            const sportMatch    = activeSport    === 'all' || card.dataset.sport     === activeSport;
+            const playtypeMatch = activePlaytype === 'all' || card.dataset.playtype  === activePlaytype;
+            const skillMatch    = activeSkill    === 'all' || card.dataset.skill     === activeSkill;
+            const seasonMatch   = activeSeason   === 'all' || card.dataset.season    === activeSeason;
+            const searchMatch   = !searchQuery   || card.dataset.search.includes(searchQuery);
+            const show = sportMatch && playtypeMatch && skillMatch && seasonMatch && searchMatch;
             card.style.display = show ? '' : 'none';
             if (show) visible++;
         });
@@ -156,6 +166,15 @@
             document.querySelectorAll('[data-filter="sport"]').forEach(b => b.classList.remove('on'));
             btn.classList.add('on');
             activeSport = btn.dataset.val;
+            apply();
+        });
+    });
+
+    document.querySelectorAll('[data-filter="playtype"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-filter="playtype"]').forEach(b => b.classList.remove('on'));
+            btn.classList.add('on');
+            activePlaytype = btn.dataset.val;
             apply();
         });
     });
