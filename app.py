@@ -124,7 +124,7 @@ def send_submission_email(club_name, sport):
         f"Review it at: {request.host_url}admin"
     )
     msg = MIMEText(body)
-    msg["Subject"] = f"[Dyke Sports DB] New submission: {club_name}"
+    msg["Subject"] = f"[Queer Sports DB] New submission: {club_name}"
     msg["From"]    = smtp_user
     msg["To"]      = notify_email
 
