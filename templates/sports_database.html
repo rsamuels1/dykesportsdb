@@ -43,6 +43,13 @@
 
 <div class="filter-bar" style="flex-direction:column; align-items:flex-start; gap:10px;">
     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <span class="filter-label">City</span>
+        <button class="fbtn fcity on" data-filter="city" data-val="all">All</button>
+        {% for city in cities %}
+        <button class="fbtn fcity" data-filter="city" data-val="{{ city }}">{{ city }}</button>
+        {% endfor %}
+    </div>
+    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
         <span class="filter-label">Sport</span>
         <button class="fbtn fcity on" data-filter="sport" data-val="all">All</button>
         {% for sport in sports %}
