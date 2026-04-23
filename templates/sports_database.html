@@ -49,6 +49,15 @@
         <button class="fbtn fcity" data-filter="sport" data-val="{{ sport }}">{{ sport }}</button>
         {% endfor %}
     </div>
+    {% if cities|length > 1 %}
+    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <span class="filter-label">City</span>
+        <button class="fbtn fcity on" data-filter="city" data-val="all">All</button>
+        {% for city in cities %}
+        <button class="fbtn fcity" data-filter="city" data-val="{{ city }}">{{ city }}</button>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
         <span class="filter-label">Type</span>
         <button class="fbtn fcity on" data-filter="playtype" data-val="all">All</button>
@@ -83,6 +92,7 @@
            class="card"
            style="text-decoration:none;color:inherit;display:block;"
            data-sport="{{ club['sport'] }}"
+           data-city="{{ club['city'] or '' }}"
            data-playtype="{{ club['play_type'] or '' }}"
            data-skill="{{ club['skill_level'] }}"
            data-season="{{ club['season'] }}"
@@ -140,6 +150,7 @@
     const searchEl  = document.getElementById('searchInput');
 
     let activeSport    = 'all';
+    let activeCity     = 'all';
     let activePlaytype = 'all';
     let activeSkill    = 'all';
     let activeSeason   = 'all';
@@ -148,12 +159,13 @@
     function apply() {
         let visible = 0;
         cards.forEach(card => {
-            const sportMatch    = activeSport    === 'all' || card.dataset.sport     === activeSport;
-            const playtypeMatch = activePlaytype === 'all' || card.dataset.playtype  === activePlaytype;
+            const sportMatch    = activeSport    === 'all' || card.dataset.sport    === activeSport;
+            const cityMatch     = activeCity     === 'all' || card.dataset.city     === activeCity;
+            const playtypeMatch = activePlaytype === 'all' || card.dataset.playtype === activePlaytype;
             const skillMatch    = activeSkill    === 'all' || card.dataset.skill     === activeSkill;
             const seasonMatch   = activeSeason   === 'all' || card.dataset.season    === activeSeason;
             const searchMatch   = !searchQuery   || card.dataset.search.includes(searchQuery);
-            const show = sportMatch && playtypeMatch && skillMatch && seasonMatch && searchMatch;
+            const show = sportMatch && cityMatch && playtypeMatch && skillMatch && seasonMatch && searchMatch;
             card.style.display = show ? '' : 'none';
             if (show) visible++;
         });
@@ -166,6 +178,15 @@
             document.querySelectorAll('[data-filter="sport"]').forEach(b => b.classList.remove('on'));
             btn.classList.add('on');
             activeSport = btn.dataset.val;
+            apply();
+        });
+    });
+
+    document.querySelectorAll('[data-filter="city"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-filter="city"]').forEach(b => b.classList.remove('on'));
+            btn.classList.add('on');
+            activeCity = btn.dataset.val;
             apply();
         });
     });

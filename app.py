@@ -151,7 +151,9 @@ def sports_database():
     clubs = cur.fetchall()
     cur.execute("SELECT DISTINCT sport FROM clubs WHERE status = 'approved' ORDER BY sport")
     sports = [r["sport"] for r in cur.fetchall()]
-    return render_template("sports_database.html", clubs=clubs, sports=sports,
+    cur.execute("SELECT DISTINCT city FROM clubs WHERE status = 'approved' AND city IS NOT NULL ORDER BY city")
+    cities = [r["city"] for r in cur.fetchall()]
+    return render_template("sports_database.html", clubs=clubs, sports=sports, cities=cities,
                            skill_levels=SKILL_LEVELS, seasons=SEASONS)
 
 
