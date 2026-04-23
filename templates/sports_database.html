@@ -111,12 +111,12 @@
             <div class="club-row-body">
                 <div class="club-row-name">{{ club['club_name'] }}</div>
                 <div class="club-row-tags">
-                    {% if club['play_type'] %}<span class="row-tag row-tag-type">{{ club['play_type'] }}</span>{% endif %}
-                    <span class="row-tag">{{ club['sport'] }}</span>
-                    <span class="row-tag">{{ club['skill_level'] }}</span>
+                    {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
+                    <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
+                    <span class="row-tag row-tag-skill">{{ club['skill_level'] }}</span>
+                    {% if club['play_type'] %}<span class="row-tag row-tag-playtype">{{ club['play_type'] }}</span>{% endif %}
                     {% if club['weekday'] %}<span class="row-tag">{{ club['weekday'] }}</span>{% endif %}
                     <span class="row-tag">{{ club['season'] }}</span>
-                    {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
                 </div>
             </div>
             <div class="club-row-arrow">→</div>

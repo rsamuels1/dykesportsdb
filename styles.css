@@ -464,8 +464,10 @@ body.page-application h1 {
     border: 1px solid var(--afaint); color: rgba(255,255,255,0.5);
     padding: 2px 7px;
 }
-.row-tag-type { border-color: var(--amber); color: var(--amber); }
-.row-tag-city { border-color: rgba(190,255,0,0.4); color: var(--green); }
+.row-tag-city { background: #39FF14; color: #060606; border-color: #39FF14; }
+.row-tag-sport { background: #00D9FF; color: #060606; border-color: #00D9FF; }
+.row-tag-skill { background: #FF00FF; color: #ffffff; border-color: #FF00FF; }
+.row-tag-playtype { background: #FF7A00; color: #060606; border-color: #FF7A00; }
 .club-row-arrow { font-size: 16px; color: var(--adim); flex-shrink: 0; transition: color 0.15s, transform 0.15s; }
 .club-row:hover .club-row-arrow { color: var(--amber); transform: translateX(3px); }
 @media (max-width: 500px) {
