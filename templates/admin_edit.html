@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit — {{ club['club_name'] }} · Admin</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🏅</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    .edit-wrap { max-width: 680px; margin: 0 auto; padding: 40px 20px 80px; }
+    .edit-title { font-family: var(--fhead); font-size: 28px; letter-spacing: 3px; color: var(--amber); margin-bottom: 4px; }
+    .edit-sub { font-size: 10px; letter-spacing: 2px; color: var(--adim); text-transform: uppercase; margin-bottom: 36px; }
+    .field { margin-bottom: 20px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    @media (max-width: 500px) { .field-row { grid-template-columns: 1fr; } }
+    .field-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); margin-bottom: 6px; display: block; }
+    .field-input, .field-select, .field-textarea {
+        width: 100%; background: var(--bg2); border: 1px solid var(--afaint);
+        color: var(--w); font-family: var(--fbody); font-size: 13px;
+        padding: 10px 12px; outline: none; transition: border-color 0.15s;
+        appearance: none; -webkit-appearance: none;
+    }
+    .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--green); }
+    .field-textarea { resize: vertical; min-height: 100px; }
+    .option-row { display: flex; gap: 4px; flex-wrap: wrap; }
+    .o-opt { cursor: pointer; }
+    .o-opt input { display: none; }
+    .o-opt span { display: block; padding: 8px 16px; background: var(--bg2); border: 1px solid var(--afaint); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.6); transition: border-color 0.15s, color 0.15s; }
+    .o-opt:has(input:checked) span { border-color: var(--green); color: var(--green); }
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: '▾'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--adim); pointer-events: none; font-size: 12px; }
+    .actions { display: flex; gap: 8px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--afaint); }
+    .btn-save { background: var(--amber); color: var(--bg); border: none; font-family: var(--fbody); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 12px 28px; cursor: pointer; }
+    .btn-save:hover { filter: brightness(1.1); }
+    .btn-cancel { background: transparent; color: var(--adim); border: 1px solid var(--afaint); font-family: var(--fbody); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 20px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-cancel:hover { color: var(--w); border-color: rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body>
+
+<nav style="position:sticky; top:0; z-index:100; height:52px; background:rgba(6,6,6,0.97); backdrop-filter:blur(12px); border-bottom:1px solid var(--afaint); display:flex; align-items:center; justify-content:space-between; padding:0 20px;">
+    <span style="font-family:var(--fhead); font-size:18px; letter-spacing:3px; color:var(--amber);">DYKE SPORTS DB · ADMIN</span>
+    <a href="/admin/logout" style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--adim); text-decoration:none;">Sign Out</a>
+</nav>
+
+<div class="edit-wrap">
+    <div class="edit-title">EDIT CLUB</div>
+    <div class="edit-sub">ID #{{ club['id'] }} · {{ 'Pending' if club['status'] == 'pending' else 'Published' }}</div>
+
+    <form method="POST" action="/admin/edit/{{ club['id'] }}">
+
+        <div class="field">
+            <label class="field-label" for="club_name">Club Name</label>
+            <input class="field-input" type="text" id="club_name" name="club_name" required
+                   value="{{ club['club_name'] }}">
+        </div>
+
+        <div class="field">
+            <label class="field-label" for="sport">Sport</label>
+            <input class="field-input" type="text" id="sport" name="sport" required
+                   value="{{ club['sport'] }}">
+        </div>
+
+        <div class="field-row">
+            <div>
+                <span class="field-label">Skill Level</span>
+                <div class="option-row">
+                    {% for level in skill_levels %}
+                    <label class="o-opt">
+                        <input type="radio" name="skill_level" value="{{ level }}"
+                               {% if club['skill_level'] == level %}checked{% endif %} required>
+                        <span>{{ level }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <span class="field-label">Season</span>
+                <div class="option-row">
+                    {% for s in seasons %}
+                    <label class="o-opt">
+                        <input type="radio" name="season" value="{{ s }}"
+                               {% if club['season'] == s %}checked{% endif %} required>
+                        <span>{{ s }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="field-label" for="instagram">Instagram Handle</label>
+            <input class="field-input" type="text" id="instagram" name="instagram"
+                   placeholder="dykesoccer" value="{{ club['instagram'] or '' }}">
+        </div>
+
+        <div class="field">
+            <label class="field-label" for="how_to_join">How to Join</label>
+            <input class="field-input" type="text" id="how_to_join" name="how_to_join"
+                   value="{{ club['how_to_join'] or '' }}">
+        </div>
+
+        <div class="field">
+            <label class="field-label" for="notes">Notes</label>
+            <textarea class="field-textarea" id="notes" name="notes">{{ club['notes'] or '' }}</textarea>
+        </div>
+
+        <div class="field">
+            <label class="field-label" for="status">Status</label>
+            <div class="select-wrap">
+                <select class="field-select" id="status" name="status">
+                    <option value="pending"  {% if club['status'] == 'pending'  %}selected{% endif %}>Pending</option>
+                    <option value="approved" {% if club['status'] == 'approved' %}selected{% endif %}>Published</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn-save">Save Changes</button>
+            <a href="/admin" class="btn-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

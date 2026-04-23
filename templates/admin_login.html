@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Dyke Pool Reviews</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🍒</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div style="max-width:360px; width:100%;">
+        <div style="font-family:var(--fhead); font-size:28px; letter-spacing:3px; color:var(--amber); margin-bottom:32px; line-height:1;">DYKE POOL DB<br><span style="color:var(--adim); font-size:18px;">ADMIN</span></div>
+
+        {% if error %}
+        <div style="background:rgba(255,80,80,0.1); border:1px solid rgba(255,80,80,0.4); color:rgba(255,160,160,0.9); padding:12px 16px; font-size:11px; letter-spacing:1px; margin-bottom:20px;">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" style="display:flex; flex-direction:column; gap:16px;">
+            <input type="password" name="password" placeholder="Password"
+                   style="background:var(--bg2); border:1px solid var(--afaint); color:var(--w); font-family:var(--fbody); font-size:13px; padding:12px 14px; outline:none; width:100%;"
+                   autofocus required>
+            <button type="submit"
+                    style="background:var(--amber); color:var(--w); border:none; font-family:var(--fbody); font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; padding:14px; cursor:pointer;">
+                Sign In
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

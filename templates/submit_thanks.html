@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Submission Received — Dyke Pool Reviews{% endblock %}
+
+{% block content %}
+<div style="max-width:560px; margin:0 auto; padding:80px 24px 64px;">
+    <div style="display:flex; align-items:center; gap:10px; font-size:9px; letter-spacing:2px; color:var(--amber); text-transform:uppercase; margin-bottom:24px;">
+        <div class="status-dot"></div>
+        Submission received
+    </div>
+
+    <h1 style="color:var(--w); letter-spacing:2px; margin-bottom:32px;">THANKS FOR<br>SUBMITTING.</h1>
+
+    <p style="font-size:14px; line-height:1.95; color:var(--wd); border-left:2px solid var(--afaint); padding-left:18px; margin-bottom:48px; max-width:420px;">
+        Your review is in the queue and will go live once it's been looked over.
+        We'll add it to the database soon.
+    </p>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="/sports-database" class="btn btn-primary">Browse the Database</a>
+        <a href="/submit" class="btn btn-outline">Submit Another</a>
+    </div>
+</div>
+{% endblock %}

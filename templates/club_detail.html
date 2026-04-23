@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}{{ club['club_name'] }} — Dyke Sports DB{% endblock %}
+
+{% block head %}
+<style>
+.detail-page { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+
+.detail-back { display: inline-block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--adim); text-decoration: none; margin-bottom: 28px; }
+.detail-back:hover { color: var(--green); }
+
+.detail-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+@media (max-width: 560px) { .detail-hero { grid-template-columns: 1fr; } }
+
+.detail-img { aspect-ratio: 16/10; overflow: hidden; background: var(--bg2); display: flex; align-items: center; justify-content: center; }
+.detail-img img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(100%); }
+
+.detail-sport {
+    display: inline-block; font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    border: 1px solid var(--amber); color: var(--amber); padding: 3px 10px; margin-bottom: 12px;
+}
+.detail-name { font-family: var(--fhead); font-size: clamp(28px, 6vw, 48px); letter-spacing: 2px; line-height: 1.05; margin-bottom: 20px; }
+
+.detail-meta { display: flex; flex-direction: column; justify-content: flex-end; gap: 0; }
+
+.meta-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 1px solid var(--afaint); padding: 11px 0;
+    font-size: 11px;
+}
+.meta-row:first-child { border-top: 1px solid var(--afaint); }
+.meta-key { letter-spacing: 3px; text-transform: uppercase; color: var(--adim); }
+.meta-val { color: var(--w); letter-spacing: 1px; }
+.meta-val a { color: var(--green); text-decoration: none; }
+.meta-val a:hover { text-decoration: underline; }
+
+.detail-notes { margin-top: 36px; }
+.detail-notes-label { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--green); margin-bottom: 10px; }
+.detail-notes-body { font-size: 13px; line-height: 1.9; color: rgba(255,255,255,0.72); border-left: 2px solid var(--afaint); padding-left: 16px; }
+
+.detail-foot { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--afaint); display: flex; justify-content: space-between; align-items: center; }
+.detail-date { font-size: 10px; letter-spacing: 2px; color: var(--adim); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+    <a href="/sports-database" class="detail-back">← All Clubs</a>
+
+    <div class="detail-hero">
+        <div class="detail-img">
+            {% if club['photo_url'] %}
+            <img src="{{ club['photo_url'] if club['photo_url'].startswith('http') else '/' + club['photo_url'] }}" alt="{{ club['club_name'] }}">
+            {% else %}
+            <span style="font-size:64px;">🏅</span>
+            {% endif %}
+        </div>
+
+        <div class="detail-meta">
+            <div class="detail-sport">{{ club['sport'] }}</div>
+            <div class="detail-name">{{ club['club_name'] }}</div>
+
+            <div class="meta-row">
+                <span class="meta-key">Skill Level</span>
+                <span class="meta-val">{{ club['skill_level'] }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-key">Season</span>
+                <span class="meta-val">{{ club['season'] }}</span>
+            </div>
+            {% if club['instagram'] %}
+            <div class="meta-row">
+                <span class="meta-key">Instagram</span>
+                <span class="meta-val">
+                    <a href="https://instagram.com/{{ club['instagram'] }}" target="_blank" rel="noopener">@{{ club['instagram'] }}</a>
+                </span>
+            </div>
+            {% endif %}
+            {% if club['how_to_join'] %}
+            <div class="meta-row">
+                <span class="meta-key">How to Join</span>
+                <span class="meta-val">
+                    {% if club['how_to_join'].startswith('http') %}
+                    <a href="{{ club['how_to_join'] }}" target="_blank" rel="noopener">Link →</a>
+                    {% else %}
+                    {{ club['how_to_join'] }}
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if club['notes'] %}
+    <div class="detail-notes">
+        <div class="detail-notes-label">Notes</div>
+        <div class="detail-notes-body">{{ club['notes'] }}</div>
+    </div>
+    {% endif %}
+
+    <div class="detail-foot">
+        <span class="detail-date">Added {{ club['created_at'].strftime('%Y-%m-%d') if club['created_at'] else '—' }}</span>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+flask
+python-dotenv
+gunicorn
+werkzeug
+psycopg2-binary
+# test

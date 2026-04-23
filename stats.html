@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stats — Dyke Sports DB</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🏅</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="page-stats">
+<nav></nav>
+
+<div class="page">
+<div class="eyebrow">By the numbers</div>
+<h1>THE STATS</h1>
+
+<div class="numbers">
+    <div class="num-card">
+        <div class="num-label">Total Clubs</div>
+        <div class="num-value loading" id="stat-total">—</div>
+    </div>
+</div>
+
+<div class="section-eyebrow">Breakdown</div>
+<div class="section-title">BY SPORT</div>
+<div id="sport-table"><div class="loading-state">Loading...</div></div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:60px;">
+    <div>
+        <div class="section-eyebrow">Experience</div>
+        <div class="section-title">BY SKILL LEVEL</div>
+        <div id="skill-table"><div class="loading-state">Loading...</div></div>
+    </div>
+    <div>
+        <div class="section-eyebrow">Timing</div>
+        <div class="section-title">BY SEASON</div>
+        <div id="season-table"><div class="loading-state">Loading...</div></div>
+    </div>
+</div>
+</div>
+
+<script>
+async function loadStats() {
+    const res = await fetch('/api/stats');
+    const d = await res.json();
+
+    set('stat-total', d.total);
+
+    function breakdown(data, containerId) {
+        const el = document.getElementById(containerId);
+        el.innerHTML = data.length
+            ? data.map(([label, n]) => `
+                <div class="city-row">
+                    <span class="city-name">${label}</span>
+                    <span class="city-count">${n}</span>
+                </div>`).join('')
+            : '<div class="loading-state">No data yet.</div>';
+    }
+
+    breakdown(d.by_sport,  'sport-table');
+    breakdown(d.by_skill,  'skill-table');
+    breakdown(d.by_season, 'season-table');
+
+    document.querySelectorAll('.num-value').forEach(el => el.classList.remove('loading'));
+}
+
+function set(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+}
+
+loadStats();
+</script>
+
+<footer></footer>
+<script src="/shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Dyke Sports DB</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🏅</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+    .admin-wrap { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; }
+    .admin-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 40px; flex-wrap: wrap; gap: 12px; }
+    .admin-title { font-family: var(--fhead); font-size: 36px; letter-spacing: 3px; color: var(--amber); line-height: 1; }
+    .admin-meta { font-size: 10px; letter-spacing: 1px; color: var(--adim); }
+    .pending-card { background: var(--bg2); border: 1px solid var(--afaint); margin-bottom: 12px; }
+    .pending-head { padding: 16px 20px; border-bottom: 1px solid var(--afaint); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .pending-name { font-family: var(--fhead); font-size: 22px; letter-spacing: 2px; color: var(--w); }
+    .pending-sport { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--amber); border: 1px solid var(--amber); padding: 2px 8px; display: inline-block; }
+    .pending-body { padding: 16px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 600px) { .pending-body { grid-template-columns: 1fr 1fr; } }
+    .pending-field { font-size: 11px; }
+    .pending-label { letter-spacing: 2px; text-transform: uppercase; color: var(--adim); margin-bottom: 3px; font-size: 9px; }
+    .pending-value { color: var(--w); }
+    .pending-value a { color: var(--green); text-decoration: none; }
+    .pending-notes { padding: 14px 20px 16px; font-size: 12px; line-height: 1.75; color: rgba(255,255,255,0.72); border-top: 1px solid var(--afaint); }
+    .pending-actions { padding: 16px 20px; border-top: 1px solid var(--afaint); display: flex; gap: 8px; }
+    .btn-approve { background: #39FF14; color: #060606; border: none; font-family: var(--fbody); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; cursor: pointer; }
+    .btn-reject  { background: transparent; color: rgba(255,80,80,0.8); border: 1px solid rgba(255,80,80,0.3); font-family: var(--fbody); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; cursor: pointer; }
+    .btn-edit    { background: transparent; color: var(--adim); border: 1px solid var(--afaint); font-family: var(--fbody); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-approve:hover { filter: brightness(1.1); }
+    .btn-reject:hover  { border-color: rgba(255,80,80,0.7); color: rgba(255,80,80,1); }
+    .btn-edit:hover { color: var(--w); border-color: rgba(255,255,255,0.3); }
+    .empty-state { padding: 80px 20px; text-align: center; color: var(--adim); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+    .section-title { font-family: var(--fhead); font-size: 24px; letter-spacing: 3px; color: var(--adim); margin: 48px 0 16px; }
+    .btn-delete { background: transparent; color: rgba(255,80,80,0.8); border: 1px solid rgba(255,80,80,0.3); font-family: var(--fbody); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; cursor: pointer; }
+    .btn-delete:hover { border-color: rgba(255,80,80,0.7); color: rgba(255,80,80,1); }
+    </style>
+</head>
+<body>
+
+<nav style="position:sticky; top:0; z-index:100; height:52px; background:rgba(6,6,6,0.97); backdrop-filter:blur(12px); border-bottom:1px solid var(--afaint); display:flex; align-items:center; justify-content:space-between; padding:0 20px;">
+    <span style="font-family:var(--fhead); font-size:18px; letter-spacing:3px; color:var(--amber);">DYKE SPORTS DB · ADMIN</span>
+    <a href="/admin/logout" style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--adim); text-decoration:none;">Sign Out</a>
+</nav>
+
+<div class="admin-wrap">
+    <div class="admin-header">
+        <div class="admin-title">PENDING</div>
+        <div class="admin-meta">
+            {% if pending %}{{ pending|length }} submission{{ 's' if pending|length != 1 else '' }} waiting{% else %}Queue is clear{% endif %}
+        </div>
+    </div>
+
+    {% if pending %}
+        {% for club in pending %}
+        <div class="pending-card">
+            <div class="pending-head">
+                <div>
+                    <div class="pending-name">{{ club['club_name'] }}</div>
+                    <div style="margin-top:4px;"><span class="pending-sport">{{ club['sport'] }}</span></div>
+                </div>
+                <div style="font-size:10px; letter-spacing:1px; color:var(--adim);">{{ club['created_at'].strftime('%Y-%m-%d') if club['created_at'] else '—' }}</div>
+            </div>
+
+            <div class="pending-body">
+                <div class="pending-field">
+                    <div class="pending-label">Skill Level</div>
+                    <div class="pending-value">{{ club['skill_level'] }}</div>
+                </div>
+                <div class="pending-field">
+                    <div class="pending-label">Season</div>
+                    <div class="pending-value">{{ club['season'] }}</div>
+                </div>
+                {% if club['instagram'] %}
+                <div class="pending-field">
+                    <div class="pending-label">Instagram</div>
+                    <div class="pending-value">
+                        <a href="https://instagram.com/{{ club['instagram'] }}" target="_blank">@{{ club['instagram'] }}</a>
+                    </div>
+                </div>
+                {% endif %}
+                {% if club['how_to_join'] %}
+                <div class="pending-field">
+                    <div class="pending-label">How to Join</div>
+                    <div class="pending-value">
+                        {% if club['how_to_join'].startswith('http') %}
+                        <a href="{{ club['how_to_join'] }}" target="_blank">Link →</a>
+                        {% else %}
+                        {{ club['how_to_join'] }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if club['notes'] %}
+            <div class="pending-notes">{{ club['notes'] }}</div>
+            {% endif %}
+
+            <div class="pending-actions">
+                <form method="POST" action="/admin/approve/{{ club['id'] }}" style="margin:0;">
+                    <button type="submit" class="btn-approve">✓ Publish</button>
+                </form>
+                <a href="/admin/edit/{{ club['id'] }}" class="btn-edit">✎ Edit</a>
+                <form method="POST" action="/admin/reject/{{ club['id'] }}" style="margin:0;">
+                    <button type="submit" class="btn-reject"
+                            onclick="return confirm('Delete this submission permanently?')">✕ Reject</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">No pending submissions</div>
+    {% endif %}
+
+    {% if approved %}
+    <div class="section-title">PUBLISHED CLUBS</div>
+    {% for club in approved %}
+    <div class="pending-card">
+        <div class="pending-head">
+            <div>
+                <div class="pending-name">{{ club['club_name'] }}</div>
+                <div style="margin-top:4px;"><span class="pending-sport">{{ club['sport'] }}</span></div>
+            </div>
+            <div style="font-size:10px; letter-spacing:1px; color:var(--adim);">{{ club['skill_level'] }} · {{ club['season'] }}</div>
+        </div>
+        <div class="pending-actions">
+            <a href="/admin/edit/{{ club['id'] }}" class="btn-edit">✎ Edit</a>
+            <form method="POST" action="/admin/delete/{{ club['id'] }}" style="margin:0;">
+                <button type="submit" class="btn-delete"
+                        onclick="return confirm('Permanently delete {{ club['club_name'] }}?')">✕ Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+</body>
+</html>

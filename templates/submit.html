@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Add a Club — Dyke Sports DB{% endblock %}
+
+{% block head %}
+<style>
+.form-page { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
+.form-section { margin-bottom: 40px; }
+.form-label { font-size: 9px; letter-spacing: 4px; color: var(--green); text-transform: uppercase; margin-bottom: 8px; display: block; }
+.form-input, .form-textarea, .form-select {
+    width: 100%; background: var(--bg2); border: 1px solid var(--afaint);
+    color: var(--w); font-family: var(--fbody); font-size: 13px;
+    padding: 12px 14px; outline: none;
+    transition: border-color 0.15s;
+    appearance: none; -webkit-appearance: none;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--green); }
+.form-textarea { resize: vertical; min-height: 120px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+.form-hint { font-size: 10px; color: var(--adim); margin-top: 5px; letter-spacing: 0.5px; }
+
+.select-wrap { position: relative; }
+.select-wrap::after {
+    content: '▾'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--adim); pointer-events: none; font-size: 12px;
+}
+
+.option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+@media (max-width: 480px) { .option-grid { grid-template-columns: 1fr; } }
+.option-item input[type="radio"] { display: none; }
+.option-item-label {
+    display: block; text-align: center;
+    background: var(--bg2); border: 1px solid var(--afaint);
+    padding: 12px 8px; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.6);
+    cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.option-item input:checked + .option-item-label { border-color: var(--green); color: var(--green); }
+
+.error-banner {
+    background: rgba(255,80,80,0.1); border: 1px solid rgba(255,80,80,0.4);
+    color: rgba(255,160,160,0.9); padding: 12px 16px;
+    font-size: 11px; letter-spacing: 1px; margin-bottom: 28px;
+}
+.submit-btn {
+    width: 100%; font-family: var(--fbody); font-size: 13px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: var(--amber); color: var(--w); border: none;
+    padding: 18px; cursor: pointer; transition: filter 0.15s;
+}
+.submit-btn:hover { filter: brightness(1.12); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="eyebrow">Community Directory</div>
+    <h1>ADD A<br>CLUB</h1>
+    <p style="font-size:13px; line-height:1.85; color:var(--adim); border-left:2px solid var(--afaint); padding-left:14px; margin-bottom:32px;">
+        Submissions are reviewed before going live. We'll publish it shortly after.
+    </p>
+
+    {% if error %}
+    <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/submit" enctype="multipart/form-data">
+
+        <div class="form-section">
+            <label class="form-label" for="club_name">Club Name</label>
+            <input class="form-input" type="text" id="club_name" name="club_name"
+                   placeholder="Portland Dyke FC" required value="{{ request.form.get('club_name', '') }}">
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="sport">Sport</label>
+            <input class="form-input" type="text" id="sport" name="sport"
+                   placeholder="Soccer, Flag Football, Basketball…" required value="{{ request.form.get('sport', '') }}">
+            <div class="form-hint">Enter the sport this club plays.</div>
+        </div>
+
+        <div class="form-section">
+            <span class="form-label">Skill Level</span>
+            <div class="option-grid">
+                {% for level in skill_levels %}
+                <label class="option-item">
+                    <input type="radio" name="skill_level" value="{{ level }}"
+                           {% if request.form.get('skill_level') == level %}checked{% endif %} required>
+                    <span class="option-item-label">{{ level }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <span class="form-label">Season</span>
+            <div class="option-grid">
+                {% for s in seasons %}
+                <label class="option-item">
+                    <input type="radio" name="season" value="{{ s }}"
+                           {% if request.form.get('season') == s %}checked{% endif %} required>
+                    <span class="option-item-label">{{ s }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="instagram">Instagram Handle</label>
+            <input class="form-input" type="text" id="instagram" name="instagram"
+                   placeholder="@dykesoccer" value="{{ request.form.get('instagram', '') }}">
+            <div class="form-hint">Optional — just the handle, with or without @.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="how_to_join">How to Join</label>
+            <input class="form-input" type="text" id="how_to_join" name="how_to_join"
+                   placeholder="https://… or DM on Instagram" value="{{ request.form.get('how_to_join', '') }}">
+            <div class="form-hint">Optional — a URL or brief instructions.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="notes">Notes</label>
+            <textarea class="form-textarea" id="notes" name="notes"
+                      placeholder="Practice schedule, cost, contact info, vibe...">{{ request.form.get('notes', '') }}</textarea>
+            <div class="form-hint">Optional — anything useful to know about this club.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="photo">Photo</label>
+            <label for="photo" id="photo-label" style="display:flex; align-items:center; gap:14px; background:var(--bg2); border:1px solid var(--afaint); padding:16px; cursor:pointer; transition:border-color 0.15s;">
+                <span style="font-size:22px; flex-shrink:0;">📷</span>
+                <span id="photo-text" style="font-size:12px; color:rgba(255,255,255,0.45); letter-spacing:0.5px;">Choose a photo…</span>
+            </label>
+            <input type="file" id="photo" name="photo" accept="image/*"
+                   style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;">
+            <div class="form-hint">Optional — JPG, PNG, WebP or GIF, max 10 MB.</div>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Club</button>
+
+        <script>
+        document.getElementById('photo').addEventListener('change', function () {
+            const label = document.getElementById('photo-text');
+            label.textContent = this.files[0] ? this.files[0].name : 'Choose a photo…';
+            label.style.color = this.files[0] ? 'var(--w)' : 'rgba(255,255,255,0.45)';
+            document.getElementById('photo-label').style.borderColor = this.files[0] ? 'var(--amber)' : '';
+        });
+        </script>
+    </form>
+</div>
+{% endblock %}
