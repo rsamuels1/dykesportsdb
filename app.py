@@ -22,7 +22,7 @@ app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "img", "uploads")
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "gif"}
 
-SKILL_LEVELS = ["Beginner", "Intermediate", "Competitive", "All Levels"]
+SKILL_LEVELS = ["Recreational", "Competitive", "All Levels"]
 
 SPORT_EMOJI = {
     "soccer":          "⚽",
@@ -30,7 +30,7 @@ SPORT_EMOJI = {
     "football":        "🏈",
     "basketball":      "🏀",
     "ice hockey":      "🏒",
-    "hockey":          "🏒",
+    "roller hockey":   "🏒",
     "softball":        "🥎",
     "baseball":        "⚾",
     "volleyball":      "🏐",
@@ -45,7 +45,7 @@ SPORT_EMOJI = {
     "yoga":            "🧘",
     "climbing":        "🧗",
     "roller derby":    "🛼",
-    "kickball":        "🏅",
+    "kickball":        "☄️",
     "ultimate frisbee":"🥏",
     "frisbee":         "🥏",
     "lacrosse":        "🥍",
