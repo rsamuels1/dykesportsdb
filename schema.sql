@@ -11,3 +11,20 @@ CREATE TABLE IF NOT EXISTS clubs (
     status        TEXT NOT NULL DEFAULT 'pending',
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO clubs (club_name, sport, city, instagram, website, play_type, cost, weekday, skill_level, season, notes, status)
+VALUES (
+    'Dyke Soccer',
+    'Soccer',
+    'Portland',
+    'dykesoccerpdx',
+    'https://dykesoccer.com',
+    'pick-up',
+    'Free',
+    'Saturdays',
+    'All Levels',
+    'Seasonal',
+    '🌈 🏳️‍⚧️For queer women, trans and gender-expansive folks, + 4 whom this is home ⚽️💦 est. April 2022',
+    'img/dykesoccer.png'
+    'approved'
+);
