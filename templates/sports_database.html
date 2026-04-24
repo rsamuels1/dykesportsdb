@@ -58,7 +58,10 @@
     max-width: 700px; padding-top: 2px;
 }
 
-.trans-flag { font-size: 0.8em; vertical-align: middle; line-height: 1; }
+.club-row-tags .skill-tag { display: none; }
+.club-row-tags .play-tag { display: none; }
+.club-row-tags.show-skill .skill-tag { display: inline-block; }
+.club-row-tags.show-play .play-tag { display: inline-block; }
 
 .club-row-flags {
     display: flex; align-items: center; gap: 8px;
@@ -178,12 +181,12 @@
                 <div class="club-row-tags">
                     {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
                     <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
-                    {% if club['is_comp'] %}<span class="row-tag row-tag-comp">Comp</span>{% endif %}
-                    {% if club['is_rec'] %}<span class="row-tag row-tag-rec">Rec</span>{% endif %}
-                    {% if club['is_pickup'] %}<span class="row-tag row-tag-pickup">Pick-Up</span>{% endif %}
-                    {% if club['is_league'] %}<span class="row-tag row-tag-league">League</span>{% endif %}
-                    {% if club['is_tournament'] %}<span class="row-tag row-tag-tournament">Tournament</span>{% endif %}
-                    {% if club['is_travel'] %}<span class="row-tag row-tag-travel">Travel</span>{% endif %}
+                    {% if club['is_comp'] %}<span class="row-tag row-tag-comp skill-tag">Comp</span>{% endif %}
+                    {% if club['is_rec'] %}<span class="row-tag row-tag-rec skill-tag">Rec</span>{% endif %}
+                    {% if club['is_pickup'] %}<span class="row-tag row-tag-pickup play-tag">Pick-Up</span>{% endif %}
+                    {% if club['is_league'] %}<span class="row-tag row-tag-league play-tag">League</span>{% endif %}
+                    {% if club['is_tournament'] %}<span class="row-tag row-tag-tournament play-tag">Tournament</span>{% endif %}
+                    {% if club['is_travel'] %}<span class="row-tag row-tag-travel play-tag">Travel</span>{% endif %}
                 </div>
             </div>
             {% if club['is_trans_inclusive'] or club['is_lesbian_centered'] %}
@@ -246,6 +249,13 @@
             const show = cityMatch && sportMatch && skillMatch && playMatch && transMatch && lesbianMatch && searchMatch;
             card.style.display = show ? '' : 'none';
             if (show) visible++;
+            
+            // Update tag visibility based on filter state
+            const tagsEl = card.querySelector('.club-row-tags');
+            if (tagsEl) {
+                tagsEl.classList.toggle('show-skill', activeSkill !== 'all');
+                tagsEl.classList.toggle('show-play', activePlay !== 'all');
+            }
         });
         countEl.textContent = visible + ' club' + (visible !== 1 ? 's' : '');
         noResults.style.display = visible === 0 ? 'block' : 'none';
