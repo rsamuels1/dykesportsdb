@@ -111,20 +111,6 @@
         </div>
 
         <div class="form-section">
-            <label class="form-label" for="weekday">Meeting Day</label>
-            <input class="form-input" type="text" id="weekday" name="weekday"
-                   placeholder="Saturdays, Tuesdays & Thursdays, etc." value="{{ request.form.get('weekday', '') }}">
-            <div class="form-hint">Optional — when does the club typically meet?</div>
-        </div>
-
-        <div class="form-section">
-            <label class="form-label" for="cost">Cost</label>
-            <input class="form-input" type="text" id="cost" name="cost"
-                   placeholder="Free, $10/game, etc." value="{{ request.form.get('cost', '') }}">
-            <div class="form-hint">Optional — cost to play per game or season.</div>
-        </div>
-
-        <div class="form-section">
             <span class="form-label">Skill Level <span style="color:rgba(255,80,80,0.8); font-size:8px;">* at least one required</span></span>
             <div class="option-grid">
                 <label class="option-item">
@@ -157,13 +143,6 @@
             <input class="form-input" type="url" id="website" name="website"
                    placeholder="https://…" value="{{ request.form.get('website', '') }}">
             <div class="form-hint">Optional — link to the club's website.</div>
-        </div>
-
-        <div class="form-section">
-            <label class="form-label" for="contact">Contact Info</label>
-            <input class="form-input" type="text" id="contact" name="contact"
-                   placeholder="Email, phone, or message" value="{{ request.form.get('contact', '') }}">
-            <div class="form-hint">Optional — how to reach the club organizer.</div>
         </div>
 
         <div class="form-section">

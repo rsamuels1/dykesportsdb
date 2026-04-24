@@ -461,13 +461,17 @@ body.page-application h1 {
 .club-row-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .row-tag {
     font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-    border: 1px solid var(--afaint); color: rgba(255,255,255,0.5);
+    border: 1px solid var(--afaint); color: rgba(255,255,255,0.45);
     padding: 2px 7px;
 }
-.row-tag-city { background: #39FF14; color: #060606; border-color: #39FF14; }
-.row-tag-sport { background: #00D9FF; color: #060606; border-color: #00D9FF; }
-.row-tag-skill { background: #FF00FF; color: #ffffff; border-color: #FF00FF; }
-.row-tag-playtype { background: #FF7A00; color: #060606; border-color: #FF7A00; }
+.row-tag-sport      { background: #00D9FF; color: #060606; border-color: #00D9FF; }
+.row-tag-city       { color: rgba(255,255,255,0.55); border-color: rgba(255,255,255,0.18); }
+.row-tag-comp       { background: #FF5200; color: #fff;    border-color: #FF5200; }
+.row-tag-rec        { background: #BEFF00; color: #060606; border-color: #BEFF00; }
+.row-tag-pickup     { background: #FFD000; color: #060606; border-color: #FFD000; }
+.row-tag-league     { background: #c084fc; color: #060606; border-color: #c084fc; }
+.row-tag-tournament { background: #FF3B5C; color: #fff;    border-color: #FF3B5C; }
+.row-tag-travel     { background: #39FF14; color: #060606; border-color: #39FF14; }
 .club-row-arrow { font-size: 16px; color: var(--adim); flex-shrink: 0; transition: color 0.15s, transform 0.15s; }
 .club-row:hover .club-row-arrow { color: var(--amber); transform: translateX(3px); }
 @media (max-width: 500px) {

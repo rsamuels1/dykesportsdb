@@ -22,9 +22,12 @@
     font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
     border: 1px solid var(--afaint); color: rgba(255,255,255,0.65); padding: 3px 10px;
 }
-.dtag-comp  { border-color: var(--amber); color: var(--amber); }
-.dtag-rec   { border-color: var(--green); color: var(--green); }
-.dtag-play  { border-color: rgba(0,217,255,0.4); color: rgba(0,217,255,0.8); }
+.dtag-comp       { border-color: #FF5200; color: #FF5200; }
+.dtag-rec        { border-color: #BEFF00; color: #BEFF00; }
+.dtag-pickup     { border-color: #FFD000; color: #FFD000; }
+.dtag-league     { border-color: #c084fc; color: #c084fc; }
+.dtag-tournament { border-color: #FF3B5C; color: #FF3B5C; }
+.dtag-travel     { border-color: #39FF14; color: #39FF14; }
 
 .detail-info {
     display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;
@@ -62,10 +65,10 @@
         <div class="detail-tags">
             {% if club['is_comp'] %}<span class="dtag dtag-comp">Competitive</span>{% endif %}
             {% if club['is_rec']  %}<span class="dtag dtag-rec">Recreational</span>{% endif %}
-            {% if club['is_pickup']     %}<span class="dtag dtag-play">Pick-Up</span>{% endif %}
-            {% if club['is_league']     %}<span class="dtag dtag-play">League</span>{% endif %}
-            {% if club['is_tournament'] %}<span class="dtag dtag-play">Tournament</span>{% endif %}
-            {% if club['is_travel']     %}<span class="dtag dtag-play">Travel</span>{% endif %}
+            {% if club['is_pickup']     %}<span class="dtag dtag-pickup">Pick-Up</span>{% endif %}
+            {% if club['is_league']     %}<span class="dtag dtag-league">League</span>{% endif %}
+            {% if club['is_tournament'] %}<span class="dtag dtag-tournament">Tournament</span>{% endif %}
+            {% if club['is_travel']     %}<span class="dtag dtag-travel">Travel</span>{% endif %}
         </div>
     </div>
 
@@ -74,20 +77,6 @@
         <div class="info-block">
             <div class="info-key">City</div>
             <div class="info-val">{{ club['city'] }}</div>
-        </div>
-        {% endif %}
-
-        {% if club['weekday'] %}
-        <div class="info-block">
-            <div class="info-key">When</div>
-            <div class="info-val">{{ club['weekday'] }}</div>
-        </div>
-        {% endif %}
-
-        {% if club['cost'] %}
-        <div class="info-block">
-            <div class="info-key">Cost</div>
-            <div class="info-val">{{ club['cost'] }}</div>
         </div>
         {% endif %}
 

@@ -76,14 +76,6 @@
     <div class="club-list" id="clubGrid">
         {% for club in clubs %}
         {% set emoji = sport_emoji.get(club['sport'].lower(), '🏅') %}
-        {% set skill_tags = [] %}
-        {% if club['is_comp'] %}{% set _ = skill_tags.append('Competitive') %}{% endif %}
-        {% if club['is_rec'] %}{% set _ = skill_tags.append('Recreational') %}{% endif %}
-        {% set play_tags = [] %}
-        {% if club['is_pickup'] %}{% set _ = play_tags.append('Pick-Up') %}{% endif %}
-        {% if club['is_league'] %}{% set _ = play_tags.append('League') %}{% endif %}
-        {% if club['is_tournament'] %}{% set _ = play_tags.append('Tournament') %}{% endif %}
-        {% if club['is_travel'] %}{% set _ = play_tags.append('Travel') %}{% endif %}
         <a href="/sports-database/{{ club['id'] }}"
            class="club-row"
            data-sport="{{ club['sport'] }}"
@@ -107,9 +99,13 @@
                 <div class="club-row-name">{{ club['club_name'] }}</div>
                 <div class="club-row-tags">
                     <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
-                    {% if club['city'] %}<span class="row-tag">{{ club['city'] }}</span>{% endif %}
-                    {% for tag in skill_tags %}<span class="row-tag row-tag-skill">{{ tag }}</span>{% endfor %}
-                    {% for tag in play_tags %}<span class="row-tag">{{ tag }}</span>{% endfor %}
+                    {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
+                    {% if club['is_comp'] %}<span class="row-tag row-tag-comp">Comp</span>{% endif %}
+                    {% if club['is_rec'] %}<span class="row-tag row-tag-rec">Rec</span>{% endif %}
+                    {% if club['is_pickup'] %}<span class="row-tag row-tag-pickup">Pick-Up</span>{% endif %}
+                    {% if club['is_league'] %}<span class="row-tag row-tag-league">League</span>{% endif %}
+                    {% if club['is_tournament'] %}<span class="row-tag row-tag-tournament">Tournament</span>{% endif %}
+                    {% if club['is_travel'] %}<span class="row-tag row-tag-travel">Travel</span>{% endif %}
                 </div>
             </div>
             <div class="club-row-arrow">→</div>

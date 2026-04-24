@@ -9,67 +9,185 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+.stat-divider {
+    border: none; border-top: 1px solid var(--afaint); margin: 56px 0 0;
+}
+.two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 0;
+}
+@media (max-width: 600px) { .two-col { grid-template-columns: 1fr; gap: 0; } }
+
+.bar-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.bar-row { display: flex; flex-direction: column; gap: 5px; }
+.bar-meta { display: flex; justify-content: space-between; align-items: baseline; }
+.bar-label { font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.85); }
+.bar-count { font-family: var(--fterm, monospace); font-size: 10px; color: var(--adim); }
+.bar-track { height: 4px; background: var(--afaint); }
+.bar-fill  { height: 100%; width: 0; transition: width 0.9s cubic-bezier(.22,1,.36,1); }
+.bar-fill-green  { background: var(--green); }
+.bar-fill-amber  { background: var(--amber); }
+.bar-fill-cyan   { background: #00D9FF; }
+.bar-fill-purple { background: #c084fc; }
+
+.city-grid-stats {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 2px; margin-top: 4px;
+}
+.city-pill {
+    background: var(--bg2); border: 1px solid var(--afaint);
+    padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;
+}
+.city-pill-name { font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.8); }
+.city-pill-n    { font-family: var(--fterm, monospace); font-size: 11px; color: var(--green); }
+
+.num-sub { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--adim); margin-top: 4px; }
+</style>
 </head>
 <body class="page-stats">
 <nav></nav>
 
 <div class="page">
-<div class="eyebrow">By the numbers</div>
-<h1>THE STATS</h1>
+    <div class="eyebrow">By the numbers</div>
+    <h1>THE STATS</h1>
 
-<div class="numbers">
-    <div class="num-card">
-        <div class="num-label">Total Clubs</div>
-        <div class="num-value loading" id="stat-total">—</div>
+    <!-- top-line numbers -->
+    <div class="numbers" id="numbers-grid">
+        <div class="num-card">
+            <div class="num-label">Total Clubs</div>
+            <div class="num-value loading" id="stat-total">—</div>
+        </div>
+        <div class="num-card">
+            <div class="num-label">Cities</div>
+            <div class="num-value loading" id="stat-cities">—</div>
+        </div>
+        <div class="num-card">
+            <div class="num-label">Sports</div>
+            <div class="num-value loading" id="stat-sports">—</div>
+        </div>
+        <div class="num-card">
+            <div class="num-label">Top Sport</div>
+            <div class="num-value loading" id="stat-top-sport" style="font-size:clamp(18px,3vw,32px); letter-spacing:1px;">—</div>
+            <div class="num-sub" id="stat-top-sport-n"></div>
+        </div>
     </div>
-</div>
 
-<div class="section-eyebrow">Breakdown</div>
-<div class="section-title">BY SPORT</div>
-<div id="sport-table"><div class="loading-state">Loading...</div></div>
+    <hr class="stat-divider">
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-top:60px;">
-    <div>
-        <div class="section-eyebrow">Experience</div>
-        <div class="section-title">BY SKILL LEVEL</div>
-        <div id="skill-table"><div class="loading-state">Loading...</div></div>
+    <!-- by sport -->
+    <div class="section-eyebrow">Breakdown</div>
+    <div class="section-title">BY SPORT</div>
+    <div class="bar-list" id="sport-bars"><div class="loading-state">Loading…</div></div>
+
+    <hr class="stat-divider">
+
+    <!-- skill + play type side by side -->
+    <div class="two-col">
+        <div>
+            <div class="section-eyebrow">Experience</div>
+            <div class="section-title">SKILL LEVEL</div>
+            <div class="bar-list" id="skill-bars"><div class="loading-state">Loading…</div></div>
+        </div>
+        <div>
+            <div class="section-eyebrow">Format</div>
+            <div class="section-title">PLAY TYPE</div>
+            <div class="bar-list" id="play-bars"><div class="loading-state">Loading…</div></div>
+        </div>
     </div>
-    <div>
-        <div class="section-eyebrow">Timing</div>
-        <div class="section-title">BY SEASON</div>
-        <div id="season-table"><div class="loading-state">Loading...</div></div>
+
+    <!-- by city (only shown if there's data) -->
+    <div id="city-section" style="display:none;">
+        <hr class="stat-divider">
+        <div class="section-eyebrow">Where</div>
+        <div class="section-title">BY CITY</div>
+        <div class="city-grid-stats" id="city-grid"></div>
     </div>
-</div>
 </div>
 
 <script>
 async function loadStats() {
-    const res = await fetch('/api/stats');
-    const d = await res.json();
-
-    set('stat-total', d.total);
-
-    function breakdown(data, containerId) {
-        const el = document.getElementById(containerId);
-        el.innerHTML = data.length
-            ? data.map(([label, n]) => `
-                <div class="city-row">
-                    <span class="city-name">${label}</span>
-                    <span class="city-count">${n}</span>
-                </div>`).join('')
-            : '<div class="loading-state">No data yet.</div>';
+    let d;
+    try {
+        const res = await fetch('/api/stats');
+        d = await res.json();
+    } catch(e) {
+        document.getElementById('stat-total').textContent = 'Error';
+        return;
     }
 
-    breakdown(d.by_sport,  'sport-table');
-    breakdown(d.by_skill,  'skill-table');
-    breakdown(d.by_season, 'season-table');
+    set('stat-total',   d.total);
+    set('stat-cities',  d.num_cities);
+    set('stat-sports',  d.num_sports);
+
+    if (d.by_sport && d.by_sport.length) {
+        const [topSport, topN] = d.by_sport[0];
+        set('stat-top-sport',   topSport);
+        set('stat-top-sport-n', topN + ' club' + (topN !== 1 ? 's' : ''));
+    }
 
     document.querySelectorAll('.num-value').forEach(el => el.classList.remove('loading'));
+
+    // sport bars
+    if (d.by_sport && d.by_sport.length) {
+        const maxN = d.by_sport[0][1];
+        document.getElementById('sport-bars').innerHTML = d.by_sport.map(([label, n]) =>
+            barRow(label, n, Math.round(n / maxN * 100), 'bar-fill-green')
+        ).join('');
+    }
+
+    // skill bars (base = total clubs so you can compare)
+    const base = d.total || 1;
+    document.getElementById('skill-bars').innerHTML = [
+        ['Competitive',  d.competitive,  'bar-fill-amber'],
+        ['Recreational', d.recreational, 'bar-fill-green'],
+    ].map(([label, n, cls]) =>
+        barRow(label, n, Math.round(n / base * 100), cls)
+    ).join('') || '<div class="loading-state">No data</div>';
+
+    // play-type bars
+    document.getElementById('play-bars').innerHTML = [
+        ['Pick-Up',    d.pickup,     'bar-fill-cyan'],
+        ['League',     d.league,     'bar-fill-cyan'],
+        ['Tournament', d.tournament, 'bar-fill-purple'],
+        ['Travel',     d.travel,     'bar-fill-purple'],
+    ].map(([label, n, cls]) =>
+        barRow(label, n, Math.round(n / base * 100), cls)
+    ).join('') || '<div class="loading-state">No data</div>';
+
+    // city grid
+    if (d.by_city && d.by_city.length) {
+        document.getElementById('city-section').style.display = '';
+        document.getElementById('city-grid').innerHTML = d.by_city.map(([city, n]) =>
+            `<div class="city-pill">
+                <span class="city-pill-name">${city}</span>
+                <span class="city-pill-n">${n}</span>
+            </div>`
+        ).join('');
+    }
+
+    // animate bars after a tick
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.querySelectorAll('.bar-fill[data-w]').forEach(el => {
+            el.style.width = el.dataset.w + '%';
+        });
+    }));
+}
+
+function barRow(label, n, pct, fillClass) {
+    return `<div class="bar-row">
+        <div class="bar-meta">
+            <span class="bar-label">${label}</span>
+            <span class="bar-count">${n}</span>
+        </div>
+        <div class="bar-track">
+            <div class="bar-fill ${fillClass}" data-w="${pct}" style="width:0%"></div>
+        </div>
+    </div>`;
 }
 
 function set(id, val) {
     const el = document.getElementById(id);
-    if (el) el.textContent = val;
+    if (el) el.textContent = val ?? '—';
 }
 
 loadStats();

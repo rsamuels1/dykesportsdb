@@ -214,7 +214,6 @@ def submit():
         is_travel   = request.form.get("is_travel") == "on"
         weekday     = request.form.get("weekday", "").strip() or None
         cost        = request.form.get("cost", "").strip() or None
-        contact     = request.form.get("contact", "").strip() or None
         how_to_join = request.form.get("how_to_join", "").strip() or None
         instagram   = request.form.get("instagram", "").strip().lstrip("@") or None
         website     = request.form.get("website", "").strip() or None
@@ -243,10 +242,10 @@ def submit():
                 cur.execute(
                     """INSERT INTO clubs
                        (club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
-                        weekday, cost, contact, how_to_join, instagram, website, notes, photo_url, status)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
+                        weekday, cost, how_to_join, instagram, website, notes, photo_url, status)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
                     [club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
-                     weekday, cost, contact, how_to_join, instagram, website, notes, photo_url],
+                     weekday, cost, how_to_join, instagram, website, notes, photo_url],
                 )
                 db.commit()
                 send_submission_email(club_name, sport)
@@ -266,22 +265,28 @@ def api_stats():
         return jsonify({"error": "Database unavailable"}), 503
     db = get_db()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT sport, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel FROM clubs WHERE status = 'approved'")
+    cur.execute("""SELECT sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel
+                   FROM clubs WHERE status = 'approved'""")
     clubs = cur.fetchall()
 
-    by_sport = {}
+    by_sport, by_city = {}, {}
     for c in clubs:
         by_sport[c["sport"]] = by_sport.get(c["sport"], 0) + 1
+        if c["city"]:
+            by_city[c["city"]] = by_city.get(c["city"], 0) + 1
 
     return jsonify({
-        "total":    len(clubs),
-        "by_sport": sorted(by_sport.items(), key=lambda x: -x[1]),
+        "total":      len(clubs),
+        "num_cities": len(by_city),
+        "num_sports": len(by_sport),
+        "by_sport":   sorted(by_sport.items(), key=lambda x: -x[1]),
+        "by_city":    sorted(by_city.items(), key=lambda x: -x[1]),
         "competitive":  sum(1 for c in clubs if c["is_comp"]),
         "recreational": sum(1 for c in clubs if c["is_rec"]),
-        "pickup":    sum(1 for c in clubs if c["is_pickup"]),
-        "league":    sum(1 for c in clubs if c["is_league"]),
-        "tournament": sum(1 for c in clubs if c["is_tournament"]),
-        "travel":    sum(1 for c in clubs if c["is_travel"]),
+        "pickup":       sum(1 for c in clubs if c["is_pickup"]),
+        "league":       sum(1 for c in clubs if c["is_league"]),
+        "tournament":   sum(1 for c in clubs if c["is_tournament"]),
+        "travel":       sum(1 for c in clubs if c["is_travel"]),
     })
 
 
@@ -357,7 +362,7 @@ def admin_edit(club_id):
                    club_name = %s, sport = %s, city = %s,
                    is_comp = %s, is_rec = %s,
                    is_pickup = %s, is_league = %s, is_tournament = %s, is_travel = %s,
-                   weekday = %s, cost = %s, contact = %s,
+                   weekday = %s, cost = %s,
                    how_to_join = %s, instagram = %s, website = %s, notes = %s, status = %s
                    WHERE id = %s""",
                 [
@@ -372,7 +377,6 @@ def admin_edit(club_id):
                     request.form.get("is_travel") == "on",
                     request.form.get("weekday", "").strip() or None,
                     request.form.get("cost", "").strip() or None,
-                    request.form.get("contact", "").strip() or None,
                     request.form.get("how_to_join", "").strip() or None,
                     instagram,
                     request.form.get("website", "").strip() or None,
