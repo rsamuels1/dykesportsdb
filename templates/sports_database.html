@@ -89,10 +89,6 @@
 {% if clubs %}
 <div class="search-wrap">
     <input class="search-input" type="search" id="searchInput" placeholder="Search clubs, sports, notes…" autocomplete="off">
-    <div style="margin-top:10px; font-size:12px; color: rgba(255,255,255,0.65);">
-        <div style="margin-bottom:4px;"><strong>Skill:</strong> Competitive = serious players • Recreational = casual/fun focus</div>
-        <div><strong>Play Type:</strong> Pick-Up = casual drop-ins • League = regular season • Tournament = competitions • Travel = away games</div>
-    </div>
 </div>
 
 <div class="filter-bar" style="flex-direction:column; align-items:flex-start; gap:10px;">
@@ -117,21 +113,27 @@
     </div>
 
     <!-- buttons: skill -->
-    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-        <span class="filter-label">Skill</span>
-        <button class="fbtn fcity on" data-filter="skill" data-val="all">All</button>
-        <button class="fbtn fcity" data-filter="skill" data-val="comp">Competitive</button>
-        <button class="fbtn fcity" data-filter="skill" data-val="rec">Recreational</button>
+    <div style="display:flex; flex-direction:column; gap:5px;">
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <span class="filter-label">Skill</span>
+            <button class="fbtn fcity on" data-filter="skill" data-val="all">All</button>
+            <button class="fbtn fcity" data-filter="skill" data-val="comp">Competitive</button>
+            <button class="fbtn fcity" data-filter="skill" data-val="rec">Recreational</button>
+        </div>
+        <div style="font-size:12px; color: rgba(255,255,255,0.65);">Competitive = serious players • Recreational = casual/fun focus</div>
     </div>
 
     <!-- buttons: play type -->
-    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-        <span class="filter-label">Play Type</span>
-        <button class="fbtn fcity on" data-filter="play" data-val="all">All</button>
-        <button class="fbtn fcity" data-filter="play" data-val="pickup">Pick-Up</button>
-        <button class="fbtn fcity" data-filter="play" data-val="league">League</button>
-        <button class="fbtn fcity" data-filter="play" data-val="tournament">Tournament</button>
-        <button class="fbtn fcity" data-filter="play" data-val="travel">Travel</button>
+    <div style="display:flex; flex-direction:column; gap:5px;">
+        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <span class="filter-label">Play Type</span>
+            <button class="fbtn fcity on" data-filter="play" data-val="all">All</button>
+            <button class="fbtn fcity" data-filter="play" data-val="pickup">Pick-Up</button>
+            <button class="fbtn fcity" data-filter="play" data-val="league">League</button>
+            <button class="fbtn fcity" data-filter="play" data-val="tournament">Tournament</button>
+            <button class="fbtn fcity" data-filter="play" data-val="travel">Travel</button>
+        </div>
+        <div style="font-size:12px; color: rgba(255,255,255,0.65);">Pick-Up = casual drop-ins • League = regular season • Tournament = competitions • Travel = away games</div>
     </div>
 
     <!-- trans inclusive toggle -->
