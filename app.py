@@ -351,36 +351,41 @@ def admin_edit(club_id):
     if request.method == "POST":
         cur = db.cursor()
         instagram = request.form.get("instagram", "").strip().lstrip("@") or None
-        cur.execute(
-            """UPDATE clubs SET
-               club_name = %s, sport = %s, city = %s,
-               is_comp = %s, is_rec = %s,
-               is_pickup = %s, is_league = %s, is_tournament = %s, is_travel = %s,
-               weekday = %s, cost = %s, contact = %s,
-               how_to_join = %s, instagram = %s, website = %s, notes = %s, status = %s
-               WHERE id = %s""",
-            [
-                request.form.get("club_name", "").strip(),
-                request.form.get("sport", "").strip(),
-                request.form.get("city", "").strip() or None,
-                request.form.get("is_comp") == "on",
-                request.form.get("is_rec") == "on",
-                request.form.get("is_pickup") == "on",
-                request.form.get("is_league") == "on",
-                request.form.get("is_tournament") == "on",
-                request.form.get("is_travel") == "on",
-                request.form.get("weekday", "").strip() or None,
-                request.form.get("cost", "").strip() or None,
-                request.form.get("contact", "").strip() or None,
-                request.form.get("how_to_join", "").strip() or None,
-                instagram,
-                request.form.get("website", "").strip() or None,
-                request.form.get("notes", "").strip() or None,
-                request.form.get("status", "approved"),
-                club_id,
-            ],
-        )
-        db.commit()
+        try:
+            cur.execute(
+                """UPDATE clubs SET
+                   club_name = %s, sport = %s, city = %s,
+                   is_comp = %s, is_rec = %s,
+                   is_pickup = %s, is_league = %s, is_tournament = %s, is_travel = %s,
+                   weekday = %s, cost = %s, contact = %s,
+                   how_to_join = %s, instagram = %s, website = %s, notes = %s, status = %s
+                   WHERE id = %s""",
+                [
+                    request.form.get("club_name", "").strip(),
+                    request.form.get("sport", "").strip(),
+                    request.form.get("city", "").strip() or None,
+                    request.form.get("is_comp") == "on",
+                    request.form.get("is_rec") == "on",
+                    request.form.get("is_pickup") == "on",
+                    request.form.get("is_league") == "on",
+                    request.form.get("is_tournament") == "on",
+                    request.form.get("is_travel") == "on",
+                    request.form.get("weekday", "").strip() or None,
+                    request.form.get("cost", "").strip() or None,
+                    request.form.get("contact", "").strip() or None,
+                    request.form.get("how_to_join", "").strip() or None,
+                    instagram,
+                    request.form.get("website", "").strip() or None,
+                    request.form.get("notes", "").strip() or None,
+                    request.form.get("status", "approved"),
+                    club_id,
+                ],
+            )
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            print(f"[ADMIN EDIT ERROR] club_id={club_id}: {e}")
+            return f"<pre>Save failed:\n{e}</pre>", 500
         return redirect(url_for("admin"))
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute("SELECT * FROM clubs WHERE id = %s", [club_id])
