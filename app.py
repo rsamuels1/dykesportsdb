@@ -22,8 +22,6 @@ app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "img", "uploads")
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp", "gif"}
 
-SKILL_LEVELS = ["Recreational", "Competitive", "All Levels"]
-
 SPORT_EMOJI = {
     "soccer":          "⚽",
     "flag football":   "🏈",
@@ -52,7 +50,6 @@ SPORT_EMOJI = {
     "rugby":           "🏉",
     "pickleball":      "🏓",
 }
-SEASONS      = ["Year-Round", "Spring", "Summer", "Fall", "Winter"]
 
 
 def allowed_file(filename):
@@ -182,10 +179,7 @@ def sports_database():
     sports = [r["sport"] for r in cur.fetchall()]
     cur.execute("SELECT DISTINCT city FROM clubs WHERE status = 'approved' AND city IS NOT NULL ORDER BY city")
     cities = [r["city"] for r in cur.fetchall()]
-    cur.execute("SELECT DISTINCT weekday FROM clubs WHERE status = 'approved' AND weekday IS NOT NULL ORDER BY weekday")
-    weekdays = [r["weekday"] for r in cur.fetchall()]
     return render_template("sports_database.html", clubs=clubs, sports=sports, cities=cities,
-                           weekdays=weekdays, skill_levels=SKILL_LEVELS, seasons=SEASONS,
                            sport_emoji=SPORT_EMOJI)
 
 
@@ -212,9 +206,12 @@ def submit():
         club_name   = request.form.get("club_name", "").strip()
         sport       = request.form.get("sport", "").strip()
         city        = request.form.get("city", "").strip() or None
-        skill_level = request.form.get("skill_level", "").strip()
-        season      = request.form.get("season", "").strip()
-        play_type   = request.form.get("play_type", "").strip() or None
+        is_comp     = request.form.get("is_comp") == "on"
+        is_rec      = request.form.get("is_rec") == "on"
+        is_pickup   = request.form.get("is_pickup") == "on"
+        is_league   = request.form.get("is_league") == "on"
+        is_tournament = request.form.get("is_tournament") == "on"
+        is_travel   = request.form.get("is_travel") == "on"
         weekday     = request.form.get("weekday", "").strip() or None
         cost        = request.form.get("cost", "").strip() or None
         contact     = request.form.get("contact", "").strip() or None
@@ -223,8 +220,10 @@ def submit():
         website     = request.form.get("website", "").strip() or None
         notes       = request.form.get("notes", "").strip() or None
 
-        if not all([club_name, sport, skill_level, season]):
-            error = "Club name, sport, skill level, and season are required."
+        if not all([club_name, sport]):
+            error = "Club name and sport are required."
+        elif not (is_comp or is_rec):
+            error = "Please select at least one skill level (Competitive or Recreational)."
         else:
             photo_url = None
             photo = request.files.get("photo")
@@ -243,15 +242,17 @@ def submit():
                 cur = db.cursor()
                 cur.execute(
                     """INSERT INTO clubs
-                       (club_name, sport, city, skill_level, season, play_type, weekday, cost, contact, how_to_join, instagram, website, notes, photo_url, status)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
-                    [club_name, sport, city, skill_level, season, play_type, weekday, cost, contact, how_to_join, instagram, website, notes, photo_url],
+                       (club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
+                        weekday, cost, contact, how_to_join, instagram, website, notes, photo_url, status)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
+                    [club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
+                     weekday, cost, contact, how_to_join, instagram, website, notes, photo_url],
                 )
                 db.commit()
                 send_submission_email(club_name, sport)
                 return redirect(url_for("submit_thanks"))
 
-    return render_template("submit.html", error=error, skill_levels=SKILL_LEVELS, seasons=SEASONS)
+    return render_template("submit.html", error=error)
 
 
 @app.route("/submit/thanks")
@@ -265,22 +266,22 @@ def api_stats():
         return jsonify({"error": "Database unavailable"}), 503
     db = get_db()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT sport, skill_level, season FROM clubs WHERE status = 'approved'")
+    cur.execute("SELECT sport, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel FROM clubs WHERE status = 'approved'")
     clubs = cur.fetchall()
 
     by_sport = {}
-    by_skill = {}
-    by_season = {}
     for c in clubs:
-        by_sport[c["sport"]]         = by_sport.get(c["sport"], 0) + 1
-        by_skill[c["skill_level"]]   = by_skill.get(c["skill_level"], 0) + 1
-        by_season[c["season"]]       = by_season.get(c["season"], 0) + 1
+        by_sport[c["sport"]] = by_sport.get(c["sport"], 0) + 1
 
     return jsonify({
         "total":    len(clubs),
-        "by_sport":  sorted(by_sport.items(), key=lambda x: -x[1]),
-        "by_skill":  sorted(by_skill.items(), key=lambda x: -x[1]),
-        "by_season": sorted(by_season.items(), key=lambda x: -x[1]),
+        "by_sport": sorted(by_sport.items(), key=lambda x: -x[1]),
+        "competitive":  sum(1 for c in clubs if c["is_comp"]),
+        "recreational": sum(1 for c in clubs if c["is_rec"]),
+        "pickup":    sum(1 for c in clubs if c["is_pickup"]),
+        "league":    sum(1 for c in clubs if c["is_league"]),
+        "tournament": sum(1 for c in clubs if c["is_tournament"]),
+        "travel":    sum(1 for c in clubs if c["is_travel"]),
     })
 
 
@@ -352,16 +353,28 @@ def admin_edit(club_id):
         instagram = request.form.get("instagram", "").strip().lstrip("@") or None
         cur.execute(
             """UPDATE clubs SET
-               club_name = %s, sport = %s, skill_level = %s, season = %s,
-               how_to_join = %s, instagram = %s, notes = %s, status = %s
+               club_name = %s, sport = %s, city = %s,
+               is_comp = %s, is_rec = %s,
+               is_pickup = %s, is_league = %s, is_tournament = %s, is_travel = %s,
+               weekday = %s, cost = %s, contact = %s,
+               how_to_join = %s, instagram = %s, website = %s, notes = %s, status = %s
                WHERE id = %s""",
             [
                 request.form.get("club_name", "").strip(),
                 request.form.get("sport", "").strip(),
-                request.form.get("skill_level", "").strip(),
-                request.form.get("season", "").strip(),
+                request.form.get("city", "").strip() or None,
+                request.form.get("is_comp") == "on",
+                request.form.get("is_rec") == "on",
+                request.form.get("is_pickup") == "on",
+                request.form.get("is_league") == "on",
+                request.form.get("is_tournament") == "on",
+                request.form.get("is_travel") == "on",
+                request.form.get("weekday", "").strip() or None,
+                request.form.get("cost", "").strip() or None,
+                request.form.get("contact", "").strip() or None,
                 request.form.get("how_to_join", "").strip() or None,
                 instagram,
+                request.form.get("website", "").strip() or None,
                 request.form.get("notes", "").strip() or None,
                 request.form.get("status", "approved"),
                 club_id,
@@ -374,7 +387,7 @@ def admin_edit(club_id):
     club = cur.fetchone()
     if club is None:
         return "Club not found", 404
-    return render_template("admin_edit.html", club=club, skill_levels=SKILL_LEVELS, seasons=SEASONS)
+    return render_template("admin_edit.html", club=club)
 
 
 @app.route("/admin/delete/<int:club_id>", methods=["POST"])

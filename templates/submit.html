@@ -28,7 +28,8 @@
 
 .option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
 @media (max-width: 480px) { .option-grid { grid-template-columns: 1fr; } }
-.option-item input[type="radio"] { display: none; }
+.option-item input[type="radio"],
+.option-item input[type="checkbox"] { display: none; }
 .option-item-label {
     display: block; text-align: center;
     background: var(--bg2); border: 1px solid var(--afaint);
@@ -88,10 +89,25 @@
         </div>
 
         <div class="form-section">
-            <label class="form-label" for="play_type">Play Type</label>
-            <input class="form-input" type="text" id="play_type" name="play_type"
-                   placeholder="League, Pick-Up, Both" value="{{ request.form.get('play_type', '') }}">
-            <div class="form-hint">Optional — League, Pick-Up, or Both.</div>
+            <span class="form-label">Play Type <span style="color:var(--adim); font-size:8px;">(select all that apply)</span></span>
+            <div class="option-grid">
+                <label class="option-item">
+                    <input type="checkbox" name="is_pickup" {% if request.form.get('is_pickup') %}checked{% endif %}>
+                    <span class="option-item-label">Pick-Up</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="is_league" {% if request.form.get('is_league') %}checked{% endif %}>
+                    <span class="option-item-label">League</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="is_tournament" {% if request.form.get('is_tournament') %}checked{% endif %}>
+                    <span class="option-item-label">Tournament</span>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" name="is_travel" {% if request.form.get('is_travel') %}checked{% endif %}>
+                    <span class="option-item-label">Travel</span>
+                </label>
+            </div>
         </div>
 
         <div class="form-section">
@@ -109,28 +125,16 @@
         </div>
 
         <div class="form-section">
-            <span class="form-label">Skill Level</span>
+            <span class="form-label">Skill Level <span style="color:rgba(255,80,80,0.8); font-size:8px;">* at least one required</span></span>
             <div class="option-grid">
-                {% for level in skill_levels %}
                 <label class="option-item">
-                    <input type="radio" name="skill_level" value="{{ level }}"
-                           {% if request.form.get('skill_level') == level %}checked{% endif %} required>
-                    <span class="option-item-label">{{ level }}</span>
+                    <input type="checkbox" name="is_comp" {% if request.form.get('is_comp') %}checked{% endif %}>
+                    <span class="option-item-label">Competitive</span>
                 </label>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="form-section">
-            <span class="form-label">Season</span>
-            <div class="option-grid">
-                {% for s in seasons %}
                 <label class="option-item">
-                    <input type="radio" name="season" value="{{ s }}"
-                           {% if request.form.get('season') == s %}checked{% endif %} required>
-                    <span class="option-item-label">{{ s }}</span>
+                    <input type="checkbox" name="is_rec" {% if request.form.get('is_rec') %}checked{% endif %}>
+                    <span class="option-item-label">Recreational</span>
                 </label>
-                {% endfor %}
             </div>
         </div>
 

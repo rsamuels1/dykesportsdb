@@ -14,8 +14,17 @@
 .detail-name { font-family: var(--fhead); font-size: 32px; letter-spacing: 2px; line-height: 1.1; margin-bottom: 12px; }
 .detail-sport {
     display: inline-block; font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-    background: #00D9FF; color: #060606; padding: 4px 10px; margin-bottom: 16px;
+    background: #00D9FF; color: #060606; padding: 4px 10px; margin-bottom: 8px;
 }
+
+.detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+.dtag {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    border: 1px solid var(--afaint); color: rgba(255,255,255,0.65); padding: 3px 10px;
+}
+.dtag-comp  { border-color: var(--amber); color: var(--amber); }
+.dtag-rec   { border-color: var(--green); color: var(--green); }
+.dtag-play  { border-color: rgba(0,217,255,0.4); color: rgba(0,217,255,0.8); }
 
 .detail-info {
     display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;
@@ -23,9 +32,7 @@
 }
 @media (max-width: 560px) { .detail-info { grid-template-columns: 1fr; } }
 
-.info-block {
-    display: flex; flex-direction: column; gap: 4px;
-}
+.info-block { display: flex; flex-direction: column; gap: 4px; }
 .info-key { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: var(--adim); }
 .info-val { font-size: 13px; color: var(--w); letter-spacing: 0.5px; }
 .info-val a { color: var(--green); text-decoration: none; }
@@ -51,17 +58,48 @@
         </div>
         <div class="detail-name">{{ club['club_name'] }}</div>
         <div class="detail-sport">{{ club['sport'] }}</div>
+
+        <div class="detail-tags">
+            {% if club['is_comp'] %}<span class="dtag dtag-comp">Competitive</span>{% endif %}
+            {% if club['is_rec']  %}<span class="dtag dtag-rec">Recreational</span>{% endif %}
+            {% if club['is_pickup']     %}<span class="dtag dtag-play">Pick-Up</span>{% endif %}
+            {% if club['is_league']     %}<span class="dtag dtag-play">League</span>{% endif %}
+            {% if club['is_tournament'] %}<span class="dtag dtag-play">Tournament</span>{% endif %}
+            {% if club['is_travel']     %}<span class="dtag dtag-play">Travel</span>{% endif %}
+        </div>
     </div>
 
     <div class="detail-info">
+        {% if club['city'] %}
         <div class="info-block">
-            <div class="info-key">Skill Level</div>
-            <div class="info-val">{{ club['skill_level'] }}</div>
+            <div class="info-key">City</div>
+            <div class="info-val">{{ club['city'] }}</div>
         </div>
+        {% endif %}
+
+        {% if club['weekday'] %}
         <div class="info-block">
-            <div class="info-key">Season</div>
-            <div class="info-val">{{ club['season'] }}</div>
+            <div class="info-key">When</div>
+            <div class="info-val">{{ club['weekday'] }}</div>
         </div>
+        {% endif %}
+
+        {% if club['cost'] %}
+        <div class="info-block">
+            <div class="info-key">Cost</div>
+            <div class="info-val">{{ club['cost'] }}</div>
+        </div>
+        {% endif %}
+
+        {% if club['website'] %}
+        <div class="info-block">
+            <div class="info-key">Website</div>
+            <div class="info-val">
+                <a href="{{ club['website'] }}" target="_blank" rel="noopener">{{ club['website'] }}</a>
+            </div>
+        </div>
+        {% endif %}
+
         {% if club['instagram'] %}
         <div class="info-block">
             <div class="info-key">Instagram</div>
@@ -70,6 +108,14 @@
             </div>
         </div>
         {% endif %}
+
+        {% if club['contact'] %}
+        <div class="info-block">
+            <div class="info-key">Contact</div>
+            <div class="info-val">{{ club['contact'] }}</div>
+        </div>
+        {% endif %}
+
         {% if club['how_to_join'] %}
         <div class="info-block">
             <div class="info-key">How to Join</div>

@@ -67,12 +67,30 @@
             <div class="pending-body">
                 <div class="pending-field">
                     <div class="pending-label">Skill Level</div>
-                    <div class="pending-value">{{ club['skill_level'] }}</div>
+                    <div class="pending-value">
+                        {% set sk = [] %}
+                        {% if club['is_comp'] %}{% set _ = sk.append('Comp') %}{% endif %}
+                        {% if club['is_rec']  %}{% set _ = sk.append('Rec')  %}{% endif %}
+                        {{ sk | join(' + ') or '—' }}
+                    </div>
                 </div>
                 <div class="pending-field">
-                    <div class="pending-label">Season</div>
-                    <div class="pending-value">{{ club['season'] }}</div>
+                    <div class="pending-label">Play Type</div>
+                    <div class="pending-value">
+                        {% set pt = [] %}
+                        {% if club['is_pickup']     %}{% set _ = pt.append('Pick-Up')    %}{% endif %}
+                        {% if club['is_league']     %}{% set _ = pt.append('League')     %}{% endif %}
+                        {% if club['is_tournament'] %}{% set _ = pt.append('Tournament') %}{% endif %}
+                        {% if club['is_travel']     %}{% set _ = pt.append('Travel')     %}{% endif %}
+                        {{ pt | join(', ') or '—' }}
+                    </div>
                 </div>
+                {% if club['city'] %}
+                <div class="pending-field">
+                    <div class="pending-label">City</div>
+                    <div class="pending-value">{{ club['city'] }}</div>
+                </div>
+                {% endif %}
                 {% if club['instagram'] %}
                 <div class="pending-field">
                     <div class="pending-label">Instagram</div>
@@ -124,7 +142,18 @@
                 <div class="pending-name">{{ club['club_name'] }}</div>
                 <div style="margin-top:4px;"><span class="pending-sport">{{ club['sport'] }}</span></div>
             </div>
-            <div style="font-size:10px; letter-spacing:1px; color:var(--adim);">{{ club['skill_level'] }} · {{ club['season'] }}</div>
+            <div style="font-size:10px; letter-spacing:1px; color:var(--adim);">
+                {%- set sk = [] -%}
+                {%- if club['is_comp'] -%}{%- set _ = sk.append('Comp') -%}{%- endif -%}
+                {%- if club['is_rec']  -%}{%- set _ = sk.append('Rec')  -%}{%- endif -%}
+                {{ sk | join('+') or '—' }}
+                {%- set pt = [] -%}
+                {%- if club['is_pickup']     -%}{%- set _ = pt.append('Pick-Up')    -%}{%- endif -%}
+                {%- if club['is_league']     -%}{%- set _ = pt.append('League')     -%}{%- endif -%}
+                {%- if club['is_tournament'] -%}{%- set _ = pt.append('Tournament') -%}{%- endif -%}
+                {%- if club['is_travel']     -%}{%- set _ = pt.append('Travel')     -%}{%- endif -%}
+                {%- if pt %} · {{ pt | join(', ') }}{% endif %}
+            </div>
         </div>
         <div class="pending-actions">
             <a href="/admin/edit/{{ club['id'] }}" class="btn-edit">✎ Edit</a>
