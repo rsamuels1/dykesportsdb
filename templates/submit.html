@@ -82,10 +82,10 @@
         </div>
 
         <div class="form-section">
-            <label class="form-label" for="city">City</label>
+            <label class="form-label" for="city">City, State</label>
             <input class="form-input" type="text" id="city" name="city"
                    placeholder="Portland, Seattle, etc." value="{{ request.form.get('city', '') }}">
-            <div class="form-hint">Optional — the main city where the club plays.</div>
+            <div class="form-hint">Optional — the main city and state where the club plays.</div>
         </div>
 
         <div class="form-section">
@@ -108,6 +108,7 @@
                     <span class="option-item-label">Travel</span>
                 </label>
             </div>
+            <div class="form-hint">Pick-Up: Casual drop-in games • League: Regular season play • Tournament: One-off competitions • Travel: Teams that play away games</div>
         </div>
 
         <div class="form-section">
@@ -122,6 +123,7 @@
                     <span class="option-item-label">Recreational</span>
                 </label>
             </div>
+            <div class="form-hint">Competitive: Serious players focused on winning • Recreational: Casual players focused on fun and socializing</div>
         </div>
 
         <div class="form-section">

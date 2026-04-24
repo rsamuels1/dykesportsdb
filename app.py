@@ -53,7 +53,8 @@ SPORT_EMOJI = {
     "snowboarding":    "🏂",
     "martial arts":    "🥋",
     "birding":         "🐦",
-    "pool":            "🎱"
+    "pool":            "🎱",
+    "skateboarding":   "🛹"
 }
 
 
