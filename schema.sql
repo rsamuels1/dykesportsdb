@@ -1,3 +1,14 @@
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id           SERIAL PRIMARY KEY,
+    name         TEXT NOT NULL,
+    email        TEXT NOT NULL,
+    club_id      INTEGER,
+    subject      TEXT,
+    message      TEXT NOT NULL,
+    completed    BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS clubs (
     id            SERIAL PRIMARY KEY,
     club_name     TEXT NOT NULL,

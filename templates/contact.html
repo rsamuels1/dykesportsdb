@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Contact — Queer Sports DB{% endblock %}
+
+{% block head %}
+<style>
+.form-page { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
+.form-section { margin-bottom: 28px; }
+.form-label { font-size: 9px; letter-spacing: 4px; color: var(--green); text-transform: uppercase; margin-bottom: 8px; display: block; }
+.form-input, .form-textarea, .form-select {
+    width: 100%; background: var(--bg2); border: 1px solid var(--afaint);
+    color: var(--w); font-family: var(--fbody); font-size: 13px;
+    padding: 12px 14px; outline: none;
+    transition: border-color 0.15s;
+    appearance: none; -webkit-appearance: none;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--green); }
+.form-textarea { resize: vertical; min-height: 140px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+.form-hint { font-size: 10px; color: var(--adim); margin-top: 5px; letter-spacing: 0.5px; }
+
+.select-wrap { position: relative; }
+.select-wrap::after {
+    content: '▾'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--adim); pointer-events: none; font-size: 12px;
+}
+
+.error-banner {
+    background: rgba(255,80,80,0.1); border: 1px solid rgba(255,80,80,0.4);
+    color: rgba(255,160,160,0.9); padding: 12px 16px;
+    font-size: 11px; letter-spacing: 1px; margin-bottom: 28px;
+}
+.success-banner {
+    background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.35);
+    color: #BEFF00; padding: 16px 18px;
+    font-size: 12px; letter-spacing: 1px; margin-bottom: 28px; line-height: 1.6;
+}
+.submit-btn {
+    width: 100%; font-family: var(--fbody); font-size: 13px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    background: var(--amber); color: var(--w); border: none;
+    padding: 18px; cursor: pointer; transition: filter 0.15s;
+}
+.submit-btn:hover { filter: brightness(1.12); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="eyebrow">Get in Touch</div>
+    <h1>CONTACT</h1>
+    <p style="font-size:13px; line-height:1.85; color:var(--adim); border-left:2px solid var(--afaint); padding-left:14px; margin-bottom:32px;">
+        Want to suggest an edit to a club? Found a typo? Have a question? Drop a note.
+    </p>
+
+    {% if sent %}
+    <div class="success-banner">
+        ✓ Message sent. Thank you — we'll review it soon.
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/contact">
+
+        <div class="form-row" style="margin-bottom: 28px;">
+            <div>
+                <label class="form-label" for="name">Your Name</label>
+                <input class="form-input" type="text" id="name" name="name" required
+                       value="{{ request.form.get('name', '') }}">
+            </div>
+            <div>
+                <label class="form-label" for="email">Email</label>
+                <input class="form-input" type="email" id="email" name="email" required
+                       value="{{ request.form.get('email', '') }}">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="club_id">Related Club <span style="color:var(--adim); font-size:8px;">(optional)</span></label>
+            <div class="select-wrap">
+                <select class="form-select" id="club_id" name="club_id">
+                    <option value="">— General message (not about a specific club)</option>
+                    {% for c in clubs %}
+                    <option value="{{ c['id'] }}"
+                        {% if preselect_club_id == c['id'] or request.form.get('club_id')|string == c['id']|string %}selected{% endif %}>
+                        {{ c['club_name'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-hint">Pick a club if you're suggesting an edit or update.</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="subject">Subject <span style="color:var(--adim); font-size:8px;">(optional)</span></label>
+            <input class="form-input" type="text" id="subject" name="subject"
+                   placeholder="Edit request, question, etc." value="{{ request.form.get('subject', '') }}">
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" for="message">Message</label>
+            <textarea class="form-textarea" id="message" name="message" required
+                      placeholder="What would you like us to know?">{{ request.form.get('message', '') }}</textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Send Message</button>
+    </form>
+</div>
+{% endblock %}

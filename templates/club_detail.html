@@ -66,7 +66,7 @@
 
         <div class="detail-tags">
             {% if club['is_trans_inclusive'] %}<span class="dtag dtag-trans">🏳️‍⚧️ Trans Inclusive</span>{% endif %}
-            {% if club['is_lesbian_centered'] %}<span class="dtag dtag-lesbian">🩷 Lesbian-Centered</span>{% endif %}
+            {% if club['is_lesbian_centered'] %}<span class="dtag dtag-lesbian">🩷 Lesbian/Women-Centered</span>{% endif %}
             {% if club['is_comp'] %}<span class="dtag dtag-comp">Competitive</span>{% endif %}
             {% if club['is_rec']  %}<span class="dtag dtag-rec">Recreational</span>{% endif %}
             {% if club['is_pickup']     %}<span class="dtag dtag-pickup">Pick-Up</span>{% endif %}
@@ -132,6 +132,7 @@
 
     <div class="detail-foot">
         <span class="detail-date">Added {{ club['created_at'].strftime('%Y-%m-%d') if club['created_at'] else '—' }}</span>
+        <a href="/contact?club_id={{ club['id'] }}" style="float:right; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--adim); text-decoration:none;">Suggest an edit →</a>
     </div>
 </div>
 {% endblock %}

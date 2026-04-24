@@ -32,6 +32,18 @@ ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_trans_inclusive BOOLEAN NOT NULL D
 -- 6. Lesbian-centered flag (added later)
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_lesbian_centered BOOLEAN NOT NULL DEFAULT FALSE;
 
+-- 7. Contact / edit-request messages table
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id           SERIAL PRIMARY KEY,
+    name         TEXT NOT NULL,
+    email        TEXT NOT NULL,
+    club_id      INTEGER REFERENCES clubs(id) ON DELETE SET NULL,
+    subject      TEXT,
+    message      TEXT NOT NULL,
+    completed    BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 4. Drop old columns
 ALTER TABLE clubs DROP COLUMN IF EXISTS season;
 ALTER TABLE clubs DROP COLUMN IF EXISTS skill_level;

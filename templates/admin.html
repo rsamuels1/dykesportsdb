@@ -36,13 +36,28 @@
     .section-title { font-family: var(--fhead); font-size: 24px; letter-spacing: 3px; color: var(--adim); margin: 48px 0 16px; }
     .btn-delete { background: transparent; color: rgba(255,80,80,0.8); border: 1px solid rgba(255,80,80,0.3); font-family: var(--fbody); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; cursor: pointer; }
     .btn-delete:hover { border-color: rgba(255,80,80,0.7); color: rgba(255,80,80,1); }
+    .msg-card { background: var(--bg2); border: 1px solid var(--afaint); margin-bottom: 12px; padding: 16px 20px; }
+    .msg-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .msg-from { font-size: 13px; color: var(--w); letter-spacing: 0.5px; }
+    .msg-from strong { font-family: var(--fhead); font-size: 16px; letter-spacing: 2px; margin-right: 8px; }
+    .msg-email a { color: var(--green); text-decoration: none; font-size: 11px; }
+    .msg-date { font-size: 10px; letter-spacing: 1px; color: var(--adim); }
+    .msg-meta { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--adim); margin-bottom: 8px; }
+    .msg-club { color: var(--amber); }
+    .msg-subject { font-size: 12px; letter-spacing: 1px; color: rgba(255,255,255,0.85); margin-bottom: 6px; }
+    .msg-body { font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.78); white-space: pre-wrap; margin-bottom: 12px; }
+    .btn-complete { background: #39FF14; color: #060606; border: none; font-family: var(--fbody); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 8px 16px; cursor: pointer; }
+    .btn-complete:hover { filter: brightness(1.1); }
     </style>
 </head>
 <body>
 
 <nav style="position:sticky; top:0; z-index:100; height:52px; background:rgba(6,6,6,0.97); backdrop-filter:blur(12px); border-bottom:1px solid var(--afaint); display:flex; align-items:center; justify-content:space-between; padding:0 20px;">
     <span style="font-family:var(--fhead); font-size:18px; letter-spacing:3px; color:var(--amber);">QUEER SPORTS DB · ADMIN</span>
-    <a href="/admin/logout" style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--adim); text-decoration:none;">Sign Out</a>
+    <div style="display:flex; align-items:center; gap:16px;">
+        <a href="/sports-database" style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--adim); text-decoration:none;">← Back to Database</a>
+        <a href="/admin/logout" style="font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--adim); text-decoration:none;">Sign Out</a>
+    </div>
 </nav>
 
 <div class="admin-wrap">
@@ -131,6 +146,29 @@
         {% endfor %}
     {% else %}
         <div class="empty-state">No pending submissions</div>
+    {% endif %}
+
+    {% if messages %}
+    <div class="section-title">MESSAGES</div>
+    {% for m in messages %}
+    <div class="msg-card">
+        <div class="msg-head">
+            <div class="msg-from">
+                <strong>{{ m['name'] }}</strong>
+                <span class="msg-email"><a href="mailto:{{ m['email'] }}">{{ m['email'] }}</a></span>
+            </div>
+            <div class="msg-date">{{ m['created_at'].strftime('%Y-%m-%d %H:%M') if m['created_at'] else '—' }}</div>
+        </div>
+        <div class="msg-meta">
+            {% if m['club_name'] %}<span class="msg-club">Re: {{ m['club_name'] }}</span>{% else %}General{% endif %}
+        </div>
+        {% if m['subject'] %}<div class="msg-subject">{{ m['subject'] }}</div>{% endif %}
+        <div class="msg-body">{{ m['message'] }}</div>
+        <form method="POST" action="/admin/message/{{ m['id'] }}/complete" style="margin:0;">
+            <button type="submit" class="btn-complete">✓ Mark Complete</button>
+        </form>
+    </div>
+    {% endfor %}
     {% endif %}
 
     {% if approved %}

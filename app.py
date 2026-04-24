@@ -157,6 +157,23 @@ def ensure_db_ready():
     try:
         if not _table_exists():
             return False
+        conn = _connect()
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS contact_messages (
+                id SERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                club_id INTEGER,
+                subject TEXT,
+                message TEXT NOT NULL,
+                completed BOOLEAN NOT NULL DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+        cur.close()
+        conn.close()
         _db_ready = True
         return True
     except Exception as e:
@@ -267,6 +284,47 @@ def submit_thanks():
     return render_template("submit_thanks.html")
 
 
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if not ensure_db_ready():
+        return "Database unavailable — please try again shortly.", 503
+    db = get_db()
+    error = None
+    sent  = False
+    preselect_club_id = request.args.get("club_id", type=int)
+
+    if request.method == "POST":
+        name    = request.form.get("name", "").strip()
+        email   = request.form.get("email", "").strip()
+        club_id = request.form.get("club_id", "").strip()
+        subject = request.form.get("subject", "").strip() or None
+        message = request.form.get("message", "").strip()
+        club_id_val = int(club_id) if club_id.isdigit() else None
+
+        if not all([name, email, message]):
+            error = "Name, email, and message are required."
+        else:
+            cur = db.cursor()
+            try:
+                cur.execute(
+                    """INSERT INTO contact_messages (name, email, club_id, subject, message)
+                       VALUES (%s, %s, %s, %s, %s)""",
+                    [name, email, club_id_val, subject, message],
+                )
+                db.commit()
+                sent = True
+            except Exception as e:
+                db.rollback()
+                print(f"[CONTACT ERROR] {e}")
+                error = f"Could not send message: {e}"
+
+    cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cur.execute("SELECT id, club_name FROM clubs WHERE status = 'approved' ORDER BY club_name ASC")
+    clubs = cur.fetchall()
+    return render_template("contact.html", clubs=clubs, error=error, sent=sent,
+                           preselect_club_id=preselect_club_id)
+
+
 @app.route("/api/stats")
 def api_stats():
     if not ensure_db_ready():
@@ -331,7 +389,32 @@ def admin():
     pending = cur.fetchall()
     cur.execute("SELECT * FROM clubs WHERE status = 'approved' ORDER BY club_name ASC")
     approved = cur.fetchall()
-    return render_template("admin.html", pending=pending, approved=approved)
+    messages = []
+    try:
+        cur.execute("""
+            SELECT m.*, c.club_name
+            FROM contact_messages m
+            LEFT JOIN clubs c ON c.id = m.club_id
+            WHERE m.completed = FALSE
+            ORDER BY m.created_at DESC
+        """)
+        messages = cur.fetchall()
+    except Exception as e:
+        print(f"[ADMIN MESSAGES] {e}")
+        db.rollback()
+    return render_template("admin.html", pending=pending, approved=approved, messages=messages)
+
+
+@app.route("/admin/message/<int:message_id>/complete", methods=["POST"])
+@admin_required
+def admin_message_complete(message_id):
+    if not ensure_db_ready():
+        return "Database unavailable — please try again shortly.", 503
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("UPDATE contact_messages SET completed = TRUE WHERE id = %s", [message_id])
+    db.commit()
+    return redirect(url_for("admin"))
 
 
 @app.route("/admin/approve/<int:club_id>", methods=["POST"])

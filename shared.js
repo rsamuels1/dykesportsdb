@@ -21,6 +21,7 @@
             '<li>' + a('/sports-database', 'Database') + '</li>' +
             '<li>' + a('/stats.html', 'Stats') + '</li>' +
             '<li>' + a('/about.html', 'About') + '</li>' +
+            '<li>' + a('/contact', 'Contact') + '</li>' +
             '<li>' + a('/submit', '+ Add a Club', 'pill') + '</li>' +
             '</ul>';
 
@@ -39,7 +40,11 @@
         footer.innerHTML =
             '<div class="footer-logo">QUEER SPORTS DB</div>' +
             '<div class="footer-right">' +
+            '<a href="/contact">Contact</a>' +
+            '<span class="footer-sep">·</span>' +
             '<a href="https://github.com/dykesportsdb/" target="_blank">GitHub</a>' +
+            '<span class="footer-sep">·</span>' +
+            '<a href="/admin">Admin</a>' +
             '<span class="footer-sep">·</span>' +
             '<span>© 2026</span>' +
             '</div>';

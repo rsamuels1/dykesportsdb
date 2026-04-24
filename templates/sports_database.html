@@ -55,7 +55,7 @@
 .flesbian-toggle.on { background: rgba(214,45,128,0.12); border-color: #D62D80; color: #D62D80; }
 .trans-note {
     font-size: 9px; letter-spacing: 0.5px; color: var(--adim); line-height: 1.6;
-    max-width: 520px; padding-top: 2px;
+    max-width: 700px; padding-top: 2px;
 }
 
 .trans-flag { font-size: 0.8em; vertical-align: middle; line-height: 1; }
@@ -126,9 +126,9 @@
     <!-- lesbian-centered toggle -->
     <div style="display:flex; flex-direction:column; gap:5px;">
         <div>
-            <button class="flesbian-toggle" id="lesbianToggle">🩷 Lesbian-Centered Only</button>
+            <button class="flesbian-toggle" id="lesbianToggle">🩷 Lesbian/Women-Centered Only</button>
         </div>
-        <div class="trans-note">Clubs marked 🩷 center lesbians and queer women — not exclusive, just intentionally built around them.</div>
+        <div class="trans-note">Clubs marked 🩷 center lesbians and women — not exclusive, just intentionally built around them.</div>
     </div>
 </div>
 {% endif %}
@@ -162,7 +162,7 @@
                club['notes'] or ''] | join(' ') | lower }}">
             <div class="club-row-emoji">{{ emoji }}</div>
             <div class="club-row-body">
-                <div class="club-row-name">{{ club['club_name'] }}{% if club['is_trans_inclusive'] %} <span class="trans-flag" title="Trans inclusive">🏳️‍⚧️</span>{% endif %}{% if club['is_lesbian_centered'] %} <span class="trans-flag" title="Lesbian-centered">🩷</span>{% endif %}</div>
+                <div class="club-row-name">{{ club['club_name'] }}{% if club['is_trans_inclusive'] %} <span class="trans-flag" title="Trans inclusive">🏳️‍⚧️</span>{% endif %}{% if club['is_lesbian_centered'] %} <span class="trans-flag" title="Lesbian/women-centered">🩷</span>{% endif %}</div>
                 <div class="club-row-tags">
                     {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
                     <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
