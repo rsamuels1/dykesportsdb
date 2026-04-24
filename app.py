@@ -34,7 +34,7 @@ SPORT_EMOJI = {
     "volleyball":      "🏐",
     "tennis":          "🎾",
     "swimming":        "🏊",
-    "running":         "🏃",
+    "running":         "🏃‍♀️",
     "cycling":         "🚴",
     "bowling":         "🎳",
     "golf":            "⛳",
@@ -43,6 +43,7 @@ SPORT_EMOJI = {
     "yoga":            "🧘",
     "climbing":        "🧗",
     "roller derby":    "🛼",
+    "roller skating":    "🛼",
     "kickball":        "☄️",
     "ultimate frisbee":"🥏",
     "frisbee":         "🥏",
@@ -50,6 +51,7 @@ SPORT_EMOJI = {
     "rugby":           "🏉",
     "pickleball":      "🏓",
     "snowboarding":    "🏂",
+    "martial arts":    "🥋",
 }
 
 
