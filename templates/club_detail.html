@@ -76,6 +76,23 @@
         </div>
     </div>
 
+    {% if 'dyke pool' in club['club_name'].lower() %}
+    <a href="https://pool.dykedb.org" target="_blank" rel="noopener"
+       style="display:flex; align-items:center; justify-content:space-between; gap:14px;
+              background: linear-gradient(135deg, rgba(0,217,255,0.08), rgba(214,45,128,0.08));
+              border: 1px solid #00D9FF; padding: 14px 18px; margin-bottom: 20px;
+              text-decoration:none; transition: filter 0.15s;"
+       onmouseover="this.style.filter='brightness(1.2)'" onmouseout="this.style.filter=''">
+        <div>
+            <div style="font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--adim); margin-bottom:4px;">Sister Site</div>
+            <div style="font-family:var(--fhead); font-size:18px; letter-spacing:2px; color:#00D9FF;">🎱 DYKE POOL DB →</div>
+        </div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.65); text-align:right;">
+            pool.dykedb.org
+        </div>
+    </a>
+    {% endif %}
+
     <div class="detail-info">
         {% if club['city'] %}
         <div class="info-block">

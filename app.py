@@ -52,7 +52,8 @@ SPORT_EMOJI = {
     "pickleball":      "🏓",
     "snowboarding":    "🏂",
     "martial arts":    "🥋",
-    "birding":         "🐦"
+    "birding":         "🐦",
+    "pool":            "🎱"
 }
 
 
@@ -331,8 +332,10 @@ def api_stats():
         return jsonify({"error": "Database unavailable"}), 503
     db = get_db()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("""SELECT sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
-                          is_trans_inclusive
+    cur.execute("""SELECT sport, city,
+                          is_comp, is_rec,
+                          is_pickup, is_league, is_tournament, is_travel,
+                          is_trans_inclusive, is_lesbian_centered
                    FROM clubs WHERE status = 'approved'""")
     clubs = cur.fetchall()
 
@@ -341,6 +344,17 @@ def api_stats():
         by_sport[c["sport"]] = by_sport.get(c["sport"], 0) + 1
         if c["city"]:
             by_city[c["city"]] = by_city.get(c["city"], 0) + 1
+
+    trans_count   = sum(1 for c in clubs if c["is_trans_inclusive"])
+    lesbian_count = sum(1 for c in clubs if c["is_lesbian_centered"])
+    both_count    = sum(1 for c in clubs if c["is_trans_inclusive"] and c["is_lesbian_centered"])
+    either_count  = sum(1 for c in clubs if c["is_trans_inclusive"] or c["is_lesbian_centered"])
+    no_flag_count = len(clubs) - either_count
+
+    travel_reach_count = sum(
+        1 for c in clubs
+        if c["is_travel"] or c["is_tournament"] or c["is_league"]
+    )
 
     return jsonify({
         "total":      len(clubs),
@@ -353,9 +367,13 @@ def api_stats():
         "pickup":       sum(1 for c in clubs if c["is_pickup"]),
         "league":       sum(1 for c in clubs if c["is_league"]),
         "tournament":   sum(1 for c in clubs if c["is_tournament"]),
-        "travel":           sum(1 for c in clubs if c["is_travel"]),
-        "trans_inclusive":   sum(1 for c in clubs if c["is_trans_inclusive"]),
-        "lesbian_centered":  sum(1 for c in clubs if c["is_lesbian_centered"]),
+        "travel":       sum(1 for c in clubs if c["is_travel"]),
+        "trans_inclusive":   trans_count,
+        "lesbian_centered":  lesbian_count,
+        "both_flags":        both_count,
+        "either_flag":       either_count,
+        "no_flag":           no_flag_count,
+        "travel_reach":      travel_reach_count,
     })
 
 

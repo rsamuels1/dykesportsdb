@@ -23,12 +23,16 @@
 .bar-meta { display: flex; justify-content: space-between; align-items: baseline; }
 .bar-label { font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.85); }
 .bar-count { font-family: var(--fterm, monospace); font-size: 10px; color: var(--adim); }
-.bar-track { height: 4px; background: var(--afaint); }
+.bar-track { height: 4px; background: var(--afaint); position: relative; }
 .bar-fill  { height: 100%; width: 0; transition: width 0.9s cubic-bezier(.22,1,.36,1); }
-.bar-fill-green  { background: var(--green); }
-.bar-fill-amber  { background: var(--amber); }
-.bar-fill-cyan   { background: #00D9FF; }
-.bar-fill-purple { background: #c084fc; }
+.bar-fill-green   { background: var(--green); }
+.bar-fill-amber   { background: var(--amber); }
+.bar-fill-cyan    { background: #00D9FF; }
+.bar-fill-purple  { background: #c084fc; }
+.bar-fill-trans   { background: #5BCEFA; }
+.bar-fill-pink    { background: #D62D80; }
+.bar-fill-gold    { background: linear-gradient(90deg, #5BCEFA 0%, #F5A9B8 50%, #D62D80 100%); }
+.bar-fill-dim     { background: rgba(255,255,255,0.25); }
 
 .city-grid-stats {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -42,6 +46,23 @@
 .city-pill-n    { font-family: var(--fterm, monospace); font-size: 11px; color: var(--green); }
 
 .num-sub { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--adim); margin-top: 4px; }
+
+/* inclusivity highlight cards */
+.flag-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px; margin-top: 8px;
+}
+.flag-card {
+    background: var(--bg2); border: 1px solid var(--afaint);
+    padding: 18px 20px; position: relative; overflow: hidden;
+}
+.flag-card-trans   { border-color: rgba(91,206,250,0.35); }
+.flag-card-lesbian { border-color: rgba(214,45,128,0.35); }
+.flag-card-both    { border-color: rgba(245,169,184,0.45); background: linear-gradient(135deg, rgba(91,206,250,0.05), rgba(214,45,128,0.05)); }
+.flag-emoji { font-size: 28px; line-height: 1; margin-bottom: 10px; }
+.flag-n { font-family: var(--fhead); font-size: 32px; letter-spacing: 2px; color: var(--w); line-height: 1; }
+.flag-pct { font-family: var(--fterm, monospace); font-size: 11px; color: var(--adim); margin-top: 4px; letter-spacing: 1px; }
+.flag-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 10px; line-height: 1.5; }
 </style>
 </head>
 <body class="page-stats">
@@ -71,6 +92,34 @@
             <div class="num-sub" id="stat-top-sport-n"></div>
         </div>
     </div>
+
+    <hr class="stat-divider">
+
+    <!-- inclusivity -->
+    <div class="section-eyebrow">Who They're For</div>
+    <div class="section-title">INCLUSIVITY FLAGS</div>
+    <div class="flag-grid" id="flag-grid">
+        <div class="flag-card flag-card-trans">
+            <div class="flag-emoji">🏳️‍⚧️</div>
+            <div class="flag-n loading" id="stat-trans">—</div>
+            <div class="flag-pct" id="stat-trans-pct"></div>
+            <div class="flag-label">Trans Inclusive</div>
+        </div>
+        <div class="flag-card flag-card-lesbian">
+            <div class="flag-emoji">🩷</div>
+            <div class="flag-n loading" id="stat-lesbian">—</div>
+            <div class="flag-pct" id="stat-lesbian-pct"></div>
+            <div class="flag-label">Lesbian/Women-Centered</div>
+        </div>
+        <div class="flag-card flag-card-both">
+            <div class="flag-emoji">🏳️‍⚧️ 🩷</div>
+            <div class="flag-n loading" id="stat-both">—</div>
+            <div class="flag-pct" id="stat-both-pct"></div>
+            <div class="flag-label">Both Flags · Clubs Doing It All</div>
+        </div>
+    </div>
+
+    <div class="bar-list" id="flag-bars" style="margin-top:28px;"></div>
 
     <hr class="stat-divider">
 
@@ -105,17 +154,25 @@
 </div>
 
 <script>
+function pct(n, base) {
+    if (!base) return 0;
+    return Math.round((n / base) * 100);
+}
+
 async function loadStats() {
     let d;
     try {
         const res = await fetch('/api/stats');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         d = await res.json();
     } catch(e) {
         document.getElementById('stat-total').textContent = 'Error';
+        document.getElementById('sport-bars').innerHTML = '<div class="loading-state">Could not load stats.</div>';
         return;
     }
 
-    set('stat-total',   d.total);
+    const total = d.total || 0;
+    set('stat-total',   total);
     set('stat-cities',  d.num_cities);
     set('stat-sports',  d.num_sports);
 
@@ -125,7 +182,25 @@ async function loadStats() {
         set('stat-top-sport-n', topN + ' club' + (topN !== 1 ? 's' : ''));
     }
 
-    document.querySelectorAll('.num-value').forEach(el => el.classList.remove('loading'));
+    // inclusivity numbers
+    set('stat-trans',   d.trans_inclusive ?? 0);
+    set('stat-lesbian', d.lesbian_centered ?? 0);
+    set('stat-both',    d.both_flags ?? 0);
+    set('stat-trans-pct',   pct(d.trans_inclusive,  total) + '% of clubs');
+    set('stat-lesbian-pct', pct(d.lesbian_centered, total) + '% of clubs');
+    set('stat-both-pct',    pct(d.both_flags,       total) + '% of clubs');
+
+    document.querySelectorAll('.num-value, .flag-n').forEach(el => el.classList.remove('loading'));
+
+    // inclusivity coverage bar (how many have at least one flag vs none)
+    document.getElementById('flag-bars').innerHTML = [
+        ['🏳️‍⚧️  Trans Inclusive',        d.trans_inclusive,  'bar-fill-trans'],
+        ['🩷  Lesbian/Women-Centered',    d.lesbian_centered, 'bar-fill-pink'],
+        ['Both Flags',                    d.both_flags,       'bar-fill-gold'],
+        ['No Flags Yet',                  d.no_flag,          'bar-fill-dim'],
+    ].map(([label, n, cls]) =>
+        barRow(label, n ?? 0, pct(n ?? 0, total), cls)
+    ).join('');
 
     // sport bars
     if (d.by_sport && d.by_sport.length) {
@@ -133,16 +208,18 @@ async function loadStats() {
         document.getElementById('sport-bars').innerHTML = d.by_sport.map(([label, n]) =>
             barRow(label, n, Math.round(n / maxN * 100), 'bar-fill-green')
         ).join('');
+    } else {
+        document.getElementById('sport-bars').innerHTML = '<div class="loading-state">No data</div>';
     }
 
-    // skill bars (base = total clubs so you can compare)
-    const base = d.total || 1;
+    // skill bars
+    const base = total || 1;
     document.getElementById('skill-bars').innerHTML = [
         ['Competitive',  d.competitive,  'bar-fill-amber'],
         ['Recreational', d.recreational, 'bar-fill-green'],
     ].map(([label, n, cls]) =>
-        barRow(label, n, Math.round(n / base * 100), cls)
-    ).join('') || '<div class="loading-state">No data</div>';
+        barRow(label, n, pct(n, base), cls)
+    ).join('');
 
     // play-type bars
     document.getElementById('play-bars').innerHTML = [
@@ -151,8 +228,8 @@ async function loadStats() {
         ['Tournament', d.tournament, 'bar-fill-purple'],
         ['Travel',     d.travel,     'bar-fill-purple'],
     ].map(([label, n, cls]) =>
-        barRow(label, n, Math.round(n / base * 100), cls)
-    ).join('') || '<div class="loading-state">No data</div>';
+        barRow(label, n, pct(n, base), cls)
+    ).join('');
 
     // city grid
     if (d.by_city && d.by_city.length) {
@@ -165,7 +242,7 @@ async function loadStats() {
         ).join('');
     }
 
-    // animate bars after a tick
+    // animate bars
     requestAnimationFrame(() => requestAnimationFrame(() => {
         document.querySelectorAll('.bar-fill[data-w]').forEach(el => {
             el.style.width = el.dataset.w + '%';
@@ -187,7 +264,7 @@ function barRow(label, n, pct, fillClass) {
 
 function set(id, val) {
     const el = document.getElementById(id);
-    if (el) el.textContent = val ?? '—';
+    if (el) el.textContent = (val === null || val === undefined) ? '—' : val;
 }
 
 loadStats();

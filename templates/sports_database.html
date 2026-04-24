@@ -59,6 +59,18 @@
 }
 
 .trans-flag { font-size: 0.8em; vertical-align: middle; line-height: 1; }
+
+.club-row-flags {
+    display: flex; align-items: center; gap: 8px;
+    margin-left: auto; padding-left: 12px; flex-shrink: 0;
+}
+.club-row-flags .cflag {
+    font-size: 22px; line-height: 1; display: inline-block;
+}
+@media (max-width: 480px) {
+    .club-row-flags { gap: 6px; padding-left: 8px; }
+    .club-row-flags .cflag { font-size: 18px; }
+}
 </style>
 {% endblock %}
 
@@ -118,7 +130,7 @@
     <!-- trans inclusive toggle -->
     <div style="display:flex; flex-direction:column; gap:5px;">
         <div>
-            <button class="ftrans-toggle" id="transToggle">🏳️‍⚧️ Trans Inclusive Only</button>
+            <button class="ftrans-toggle" id="transToggle">🏳️‍⚧️ Trans Inclusive</button>
         </div>
         <div class="trans-note">Clubs marked 🏳️‍⚧️ have an explicit trans inclusivity statement — often in direct defiance of their national organization's policies.</div>
     </div>
@@ -126,7 +138,7 @@
     <!-- lesbian-centered toggle -->
     <div style="display:flex; flex-direction:column; gap:5px;">
         <div>
-            <button class="flesbian-toggle" id="lesbianToggle">🩷 Lesbian/Women-Centered Only</button>
+            <button class="flesbian-toggle" id="lesbianToggle">🩷 Lesbian/Women-Centered</button>
         </div>
         <div class="trans-note">Clubs marked 🩷 center lesbians and women — not exclusive, just intentionally built around them.</div>
     </div>
@@ -162,7 +174,7 @@
                club['notes'] or ''] | join(' ') | lower }}">
             <div class="club-row-emoji">{{ emoji }}</div>
             <div class="club-row-body">
-                <div class="club-row-name">{{ club['club_name'] }}{% if club['is_trans_inclusive'] %} <span class="trans-flag" title="Trans inclusive">🏳️‍⚧️</span>{% endif %}{% if club['is_lesbian_centered'] %} <span class="trans-flag" title="Lesbian/women-centered">🩷</span>{% endif %}</div>
+                <div class="club-row-name">{{ club['club_name'] }}</div>
                 <div class="club-row-tags">
                     {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
                     <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
@@ -174,6 +186,12 @@
                     {% if club['is_travel'] %}<span class="row-tag row-tag-travel">Travel</span>{% endif %}
                 </div>
             </div>
+            {% if club['is_trans_inclusive'] or club['is_lesbian_centered'] %}
+            <div class="club-row-flags">
+                {% if club['is_trans_inclusive'] %}<span class="cflag" title="Trans inclusive">🏳️‍⚧️</span>{% endif %}
+                {% if club['is_lesbian_centered'] %}<span class="cflag" title="Lesbian/women-centered">🩷</span>{% endif %}
+            </div>
+            {% endif %}
             <div class="club-row-arrow">→</div>
         </a>
         {% endfor %}
