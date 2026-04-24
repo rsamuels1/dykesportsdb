@@ -385,13 +385,13 @@ body.page-application h1 {
 .filter-sep { width: 1px; height: 20px; background: var(--afaint); flex-shrink: 0; }
 .fcity.on { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.35); color: var(--w); }
 /* Skill level filter colors */
-.fbtn[data-filter="skill"][data-val="comp"].on { background: #39FF14; border-color: #39FF14; color: var(--bg); }
-.fbtn[data-filter="skill"][data-val="rec"].on { background: #00D9FF; border-color: #00D9FF; color: var(--bg); }
+.fbtn[data-filter="skill"][data-val="comp"].on { bbackground: #FF5200; color: #fff;    border-color: #FF5200; color: var(--bg); }
+.fbtn[data-filter="skill"][data-val="rec"].on { background: #BEFF00; color: #060606; border-color: #BEFF00; color: var(--bg); }
 /* Play type filter colors */
-.fbtn[data-filter="play"][data-val="pickup"].on { background: #FF00FF; border-color: #FF00FF; color: var(--w); }
-.fbtn[data-filter="play"][data-val="league"].on { background: #FF7A00; border-color: #FF7A00; color: var(--w); }
-.fbtn[data-filter="play"][data-val="tournament"].on { background: #39FF14; border-color: #39FF14; color: var(--bg); }
-.fbtn[data-filter="play"][data-val="travel"].on { background: #00D9FF; border-color: #00D9FF; color: var(--bg); }
+.fbtn[data-filter="play"][data-val="pickup"].on { background: #FFD000; color: #060606; border-color: #FFD000;  color: var(--w); }
+.fbtn[data-filter="play"][data-val="league"].on { background: #c084fc; color: #060606; border-color: #c084fc; color: var(--w); }
+.fbtn[data-filter="play"][data-val="tournament"].on { background: #FF3B5C; color: #fff;    border-color: #FF3B5C; color: var(--bg); }
+.fbtn[data-filter="play"][data-val="travel"].on { background: #39FF14; color: #060606; border-color: #39FF14; color: var(--bg); }
 .grid-wrap { padding: 20px; max-width: 1100px; margin: 0 auto; }
 .result-count { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 16px; }
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
