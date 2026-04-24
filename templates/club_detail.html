@@ -22,6 +22,8 @@
     font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
     border: 1px solid var(--afaint); color: rgba(255,255,255,0.65); padding: 3px 10px;
 }
+.dtag-trans      { border-color: #5BCEFA; color: #5BCEFA; background: rgba(91,206,250,0.08); }
+.dtag-lesbian    { border-color: #D62D80; color: #D62D80; background: rgba(214,45,128,0.08); }
 .dtag-comp       { border-color: #FF5200; color: #FF5200; }
 .dtag-rec        { border-color: #BEFF00; color: #BEFF00; }
 .dtag-pickup     { border-color: #FFD000; color: #FFD000; }
@@ -63,6 +65,8 @@
         <div class="detail-sport">{{ club['sport'] }}</div>
 
         <div class="detail-tags">
+            {% if club['is_trans_inclusive'] %}<span class="dtag dtag-trans">🏳️‍⚧️ Trans Inclusive</span>{% endif %}
+            {% if club['is_lesbian_centered'] %}<span class="dtag dtag-lesbian">🩷 Lesbian-Centered</span>{% endif %}
             {% if club['is_comp'] %}<span class="dtag dtag-comp">Competitive</span>{% endif %}
             {% if club['is_rec']  %}<span class="dtag dtag-rec">Recreational</span>{% endif %}
             {% if club['is_pickup']     %}<span class="dtag dtag-pickup">Pick-Up</span>{% endif %}

@@ -26,6 +26,12 @@ UPDATE clubs SET is_pickup = TRUE
 WHERE NOT is_pickup AND NOT is_league AND NOT is_tournament AND NOT is_travel
   AND play_type IS NOT NULL AND play_type != '';
 
+-- 5. Trans-inclusive flag (added later)
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_trans_inclusive BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- 6. Lesbian-centered flag (added later)
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_lesbian_centered BOOLEAN NOT NULL DEFAULT FALSE;
+
 -- 4. Drop old columns
 ALTER TABLE clubs DROP COLUMN IF EXISTS season;
 ALTER TABLE clubs DROP COLUMN IF EXISTS skill_level;

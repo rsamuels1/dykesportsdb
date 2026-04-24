@@ -36,6 +36,29 @@
 }
 .fsel:focus { border-color: rgba(255,255,255,0.3); color: var(--w); }
 .fsel.active { color: var(--w); border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.08); }
+
+.ftrans-toggle {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--fbody); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    background: var(--bg2); border: 1px solid var(--afaint); color: rgba(255,255,255,0.55);
+    padding: 5px 12px; cursor: pointer; transition: all 0.15s;
+}
+.ftrans-toggle:hover { border-color: rgba(255,255,255,0.3); color: var(--w); }
+.ftrans-toggle.on { background: rgba(91,206,250,0.12); border-color: #5BCEFA; color: #5BCEFA; }
+.flesbian-toggle {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--fbody); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    background: var(--bg2); border: 1px solid var(--afaint); color: rgba(255,255,255,0.55);
+    padding: 5px 12px; cursor: pointer; transition: all 0.15s;
+}
+.flesbian-toggle:hover { border-color: rgba(255,255,255,0.3); color: var(--w); }
+.flesbian-toggle.on { background: rgba(214,45,128,0.12); border-color: #D62D80; color: #D62D80; }
+.trans-note {
+    font-size: 9px; letter-spacing: 0.5px; color: var(--adim); line-height: 1.6;
+    max-width: 520px; padding-top: 2px;
+}
+
+.trans-flag { font-size: 0.8em; vertical-align: middle; line-height: 1; }
 </style>
 {% endblock %}
 
@@ -91,6 +114,22 @@
         <button class="fbtn fcity" data-filter="play" data-val="tournament">Tournament</button>
         <button class="fbtn fcity" data-filter="play" data-val="travel">Travel</button>
     </div>
+
+    <!-- trans inclusive toggle -->
+    <div style="display:flex; flex-direction:column; gap:5px;">
+        <div>
+            <button class="ftrans-toggle" id="transToggle">🏳️‍⚧️ Trans Inclusive Only</button>
+        </div>
+        <div class="trans-note">Clubs marked 🏳️‍⚧️ have an explicit trans inclusivity statement — often in direct defiance of their national organization's policies.</div>
+    </div>
+
+    <!-- lesbian-centered toggle -->
+    <div style="display:flex; flex-direction:column; gap:5px;">
+        <div>
+            <button class="flesbian-toggle" id="lesbianToggle">🩷 Lesbian-Centered Only</button>
+        </div>
+        <div class="trans-note">Clubs marked 🩷 center lesbians and queer women — not exclusive, just intentionally built around them.</div>
+    </div>
 </div>
 {% endif %}
 
@@ -111,6 +150,8 @@
            data-league="{{ '1' if club['is_league'] else '0' }}"
            data-tournament="{{ '1' if club['is_tournament'] else '0' }}"
            data-travel="{{ '1' if club['is_travel'] else '0' }}"
+           data-trans="{{ '1' if club['is_trans_inclusive'] else '0' }}"
+           data-lesbian="{{ '1' if club['is_lesbian_centered'] else '0' }}"
            data-search="{{ [club['club_name'], club['sport'], club['city'] or '',
                'competitive' if club['is_comp'] else '',
                'recreational' if club['is_rec'] else '',
@@ -121,7 +162,7 @@
                club['notes'] or ''] | join(' ') | lower }}">
             <div class="club-row-emoji">{{ emoji }}</div>
             <div class="club-row-body">
-                <div class="club-row-name">{{ club['club_name'] }}</div>
+                <div class="club-row-name">{{ club['club_name'] }}{% if club['is_trans_inclusive'] %} <span class="trans-flag" title="Trans inclusive">🏳️‍⚧️</span>{% endif %}{% if club['is_lesbian_centered'] %} <span class="trans-flag" title="Lesbian-centered">🩷</span>{% endif %}</div>
                 <div class="club-row-tags">
                     {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
                     <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
@@ -164,7 +205,9 @@
     let activeSport = 'all';
     let activeSkill = 'all';
     let activePlay  = 'all';
-    let searchQuery = '';
+    let transOnly    = false;
+    let lesbianOnly  = false;
+    let searchQuery  = '';
 
     function apply() {
         let visible = 0;
@@ -179,8 +222,10 @@
                 || (activePlay === 'league'     && card.dataset.league     === '1')
                 || (activePlay === 'tournament' && card.dataset.tournament === '1')
                 || (activePlay === 'travel'     && card.dataset.travel     === '1');
-            const searchMatch = !searchQuery || card.dataset.search.includes(searchQuery);
-            const show = cityMatch && sportMatch && skillMatch && playMatch && searchMatch;
+            const transMatch   = !transOnly   || card.dataset.trans   === '1';
+            const lesbianMatch = !lesbianOnly || card.dataset.lesbian === '1';
+            const searchMatch  = !searchQuery || card.dataset.search.includes(searchQuery);
+            const show = cityMatch && sportMatch && skillMatch && playMatch && transMatch && lesbianMatch && searchMatch;
             card.style.display = show ? '' : 'none';
             if (show) visible++;
         });
@@ -213,6 +258,18 @@
 
     wireFilter('skill', v => { activeSkill = v; });
     wireFilter('play',  v => { activePlay  = v; });
+
+    document.getElementById('transToggle').addEventListener('click', function () {
+        transOnly = !transOnly;
+        this.classList.toggle('on', transOnly);
+        apply();
+    });
+
+    document.getElementById('lesbianToggle').addEventListener('click', function () {
+        lesbianOnly = !lesbianOnly;
+        this.classList.toggle('on', lesbianOnly);
+        apply();
+    });
 
     searchEl.addEventListener('input', () => {
         searchQuery = searchEl.value.trim().toLowerCase();

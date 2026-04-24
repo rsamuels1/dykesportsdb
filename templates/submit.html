@@ -125,17 +125,28 @@
         </div>
 
         <div class="form-section">
+            <span class="form-label">Trans Inclusivity</span>
+            <label class="option-item" style="display:block;">
+                <input type="checkbox" name="is_trans_inclusive" {% if request.form.get('is_trans_inclusive') %}checked{% endif %}>
+                <span class="option-item-label" style="text-align:left; padding: 12px 14px;">🏳️‍⚧️ This club has an explicit trans inclusivity statement</span>
+            </label>
+            <div class="form-hint" style="margin-top:6px;">Check this if the club publicly states that trans athletes are welcome — on their website, social media, etc.</div>
+        </div>
+
+        <div class="form-section">
+            <span class="form-label">Lesbian-Centered</span>
+            <label class="option-item" style="display:block;">
+                <input type="checkbox" name="is_lesbian_centered" {% if request.form.get('is_lesbian_centered') %}checked{% endif %}>
+                <span class="option-item-label" style="text-align:left; padding: 12px 14px;">🩷 This club centers lesbians and queer women</span>
+            </label>
+            <div class="form-hint" style="margin-top:6px;">Check this if the club has specific language about being centered on lesbians — not exclusive, just intentionally built around them.</div>
+        </div>
+
+        <div class="form-section">
             <label class="form-label" for="instagram">Instagram Handle</label>
             <input class="form-input" type="text" id="instagram" name="instagram"
                    placeholder="@queersoccer" value="{{ request.form.get('instagram', '') }}">
             <div class="form-hint">Optional — just the handle, with or without @.</div>
-        </div>
-
-        <div class="form-section">
-            <label class="form-label" for="how_to_join">How to Join</label>
-            <input class="form-input" type="text" id="how_to_join" name="how_to_join"
-                   placeholder="https://… or DM on Instagram" value="{{ request.form.get('how_to_join', '') }}">
-            <div class="form-hint">Optional — a URL or brief instructions.</div>
         </div>
 
         <div class="form-section">

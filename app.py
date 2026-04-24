@@ -52,6 +52,7 @@ SPORT_EMOJI = {
     "pickleball":      "🏓",
     "snowboarding":    "🏂",
     "martial arts":    "🥋",
+    "birding":         "🐦"
 }
 
 
@@ -214,10 +215,9 @@ def submit():
         is_pickup   = request.form.get("is_pickup") == "on"
         is_league   = request.form.get("is_league") == "on"
         is_tournament = request.form.get("is_tournament") == "on"
-        is_travel   = request.form.get("is_travel") == "on"
-        weekday     = request.form.get("weekday", "").strip() or None
-        cost        = request.form.get("cost", "").strip() or None
-        how_to_join = request.form.get("how_to_join", "").strip() or None
+        is_travel          = request.form.get("is_travel") == "on"
+        is_trans_inclusive  = request.form.get("is_trans_inclusive") == "on"
+        is_lesbian_centered = request.form.get("is_lesbian_centered") == "on"
         instagram   = request.form.get("instagram", "").strip().lstrip("@") or None
         website     = request.form.get("website", "").strip() or None
         notes       = request.form.get("notes", "").strip() or None
@@ -242,17 +242,22 @@ def submit():
             if not error:
                 db = get_db()
                 cur = db.cursor()
-                cur.execute(
-                    """INSERT INTO clubs
-                       (club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
-                        weekday, cost, how_to_join, instagram, website, notes, photo_url, status)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
-                    [club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
-                     weekday, cost, how_to_join, instagram, website, notes, photo_url],
-                )
-                db.commit()
-                send_submission_email(club_name, sport)
-                return redirect(url_for("submit_thanks"))
+                try:
+                    cur.execute(
+                        """INSERT INTO clubs
+                           (club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
+                            is_trans_inclusive, is_lesbian_centered, instagram, website, notes, photo_url, status)
+                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
+                        [club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
+                         is_trans_inclusive, is_lesbian_centered, instagram, website, notes, photo_url],
+                    )
+                    db.commit()
+                    send_submission_email(club_name, sport)
+                    return redirect(url_for("submit_thanks"))
+                except Exception as e:
+                    db.rollback()
+                    print(f"[SUBMIT ERROR] {e}")
+                    error = f"Submission failed (DB error): {e}"
 
     return render_template("submit.html", error=error)
 
@@ -268,7 +273,8 @@ def api_stats():
         return jsonify({"error": "Database unavailable"}), 503
     db = get_db()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("""SELECT sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel
+    cur.execute("""SELECT sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
+                          is_trans_inclusive
                    FROM clubs WHERE status = 'approved'""")
     clubs = cur.fetchall()
 
@@ -289,7 +295,9 @@ def api_stats():
         "pickup":       sum(1 for c in clubs if c["is_pickup"]),
         "league":       sum(1 for c in clubs if c["is_league"]),
         "tournament":   sum(1 for c in clubs if c["is_tournament"]),
-        "travel":       sum(1 for c in clubs if c["is_travel"]),
+        "travel":           sum(1 for c in clubs if c["is_travel"]),
+        "trans_inclusive":   sum(1 for c in clubs if c["is_trans_inclusive"]),
+        "lesbian_centered":  sum(1 for c in clubs if c["is_lesbian_centered"]),
     })
 
 
@@ -365,8 +373,9 @@ def admin_edit(club_id):
                    club_name = %s, sport = %s, city = %s,
                    is_comp = %s, is_rec = %s,
                    is_pickup = %s, is_league = %s, is_tournament = %s, is_travel = %s,
+                   is_trans_inclusive = %s, is_lesbian_centered = %s,
                    weekday = %s, cost = %s,
-                   how_to_join = %s, instagram = %s, website = %s, notes = %s, status = %s
+                   instagram = %s, website = %s, notes = %s, status = %s
                    WHERE id = %s""",
                 [
                     request.form.get("club_name", "").strip(),
@@ -378,9 +387,10 @@ def admin_edit(club_id):
                     request.form.get("is_league") == "on",
                     request.form.get("is_tournament") == "on",
                     request.form.get("is_travel") == "on",
+                    request.form.get("is_trans_inclusive") == "on",
+                    request.form.get("is_lesbian_centered") == "on",
                     request.form.get("weekday", "").strip() or None,
                     request.form.get("cost", "").strip() or None,
-                    request.form.get("how_to_join", "").strip() or None,
                     instagram,
                     request.form.get("website", "").strip() or None,
                     request.form.get("notes", "").strip() or None,

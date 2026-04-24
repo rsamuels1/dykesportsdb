@@ -102,6 +102,26 @@
         </div>
 
         <div class="field">
+            <span class="field-label">Trans Inclusive</span>
+            <div class="option-row">
+                <label class="o-opt">
+                    <input type="checkbox" name="is_trans_inclusive" {% if club['is_trans_inclusive'] %}checked{% endif %}>
+                    <span>🏳️‍⚧️ Has explicit trans inclusivity statement</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Lesbian-Centered</span>
+            <div class="option-row">
+                <label class="o-opt">
+                    <input type="checkbox" name="is_lesbian_centered" {% if club['is_lesbian_centered'] %}checked{% endif %}>
+                    <span>🩷 Club centers lesbians and queer women</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="field">
             <span class="field-label">Play Type</span>
             <div class="option-row">
                 <label class="o-opt">
