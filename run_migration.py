@@ -18,6 +18,10 @@ for statement in [s.strip() for s in sql.split(";") if s.strip() and not s.strip
     print(f"Running: {statement[:60]}...")
     cur.execute(statement)
 
+# Fix the id sequence to prevent duplicate key errors
+print("Fixing id sequence...")
+cur.execute("SELECT setval('clubs_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM clubs))")
+
 cur.close()
 conn.close()
 print("Migration complete.")

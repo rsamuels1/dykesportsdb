@@ -172,6 +172,8 @@ def ensure_db_ready():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        # Fix the clubs id sequence to prevent duplicate key errors
+        cur.execute("SELECT setval('clubs_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM clubs))")
         conn.commit()
         cur.close()
         conn.close()
