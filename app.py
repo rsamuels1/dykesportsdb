@@ -49,6 +49,7 @@ SPORT_EMOJI = {
     "lacrosse":        "🥍",
     "rugby":           "🏉",
     "pickleball":      "🏓",
+    "snowboarding":    "🏂",
 }
 
 

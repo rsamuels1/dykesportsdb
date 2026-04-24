@@ -20,6 +20,22 @@
     font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.35);
     display: none;
 }
+
+/* dropdown filters */
+.fsel-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fsel-wrap { position: relative; }
+.fsel-wrap::after {
+    content: '▾'; position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
+    color: var(--adim); pointer-events: none; font-size: 10px;
+}
+.fsel {
+    font-family: var(--fbody); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    background: var(--bg2); border: 1px solid var(--afaint); color: rgba(255,255,255,0.55);
+    padding: 5px 26px 5px 11px; cursor: pointer; outline: none;
+    appearance: none; -webkit-appearance: none; transition: border-color 0.15s, color 0.15s;
+}
+.fsel:focus { border-color: rgba(255,255,255,0.3); color: var(--w); }
+.fsel.active { color: var(--w); border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.08); }
 </style>
 {% endblock %}
 
@@ -38,26 +54,35 @@
 </div>
 
 <div class="filter-bar" style="flex-direction:column; align-items:flex-start; gap:10px;">
-    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-        <span class="filter-label">City</span>
-        <button class="fbtn fcity on" data-filter="city" data-val="all">All</button>
-        {% for city in cities %}
-        <button class="fbtn fcity" data-filter="city" data-val="{{ city }}">{{ city }}</button>
-        {% endfor %}
+    <!-- dropdowns: city + sport -->
+    <div class="fsel-row">
+        <div class="fsel-wrap">
+            <select class="fsel" id="citySelect" aria-label="Filter by city">
+                <option value="all">All Cities</option>
+                {% for city in cities %}
+                <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="fsel-wrap">
+            <select class="fsel" id="sportSelect" aria-label="Filter by sport">
+                <option value="all">All Sports</option>
+                {% for sport in sports %}
+                <option value="{{ sport }}">{{ sport }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
-    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-        <span class="filter-label">Sport</span>
-        <button class="fbtn fcity on" data-filter="sport" data-val="all">All</button>
-        {% for sport in sports %}
-        <button class="fbtn fcity" data-filter="sport" data-val="{{ sport }}">{{ sport }}</button>
-        {% endfor %}
-    </div>
+
+    <!-- buttons: skill -->
     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
         <span class="filter-label">Skill</span>
         <button class="fbtn fcity on" data-filter="skill" data-val="all">All</button>
         <button class="fbtn fcity" data-filter="skill" data-val="comp">Competitive</button>
         <button class="fbtn fcity" data-filter="skill" data-val="rec">Recreational</button>
     </div>
+
+    <!-- buttons: play type -->
     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
         <span class="filter-label">Play Type</span>
         <button class="fbtn fcity on" data-filter="play" data-val="all">All</button>
@@ -98,8 +123,8 @@
             <div class="club-row-body">
                 <div class="club-row-name">{{ club['club_name'] }}</div>
                 <div class="club-row-tags">
-                    <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
                     {% if club['city'] %}<span class="row-tag row-tag-city">{{ club['city'] }}</span>{% endif %}
+                    <span class="row-tag row-tag-sport">{{ club['sport'] }}</span>
                     {% if club['is_comp'] %}<span class="row-tag row-tag-comp">Comp</span>{% endif %}
                     {% if club['is_rec'] %}<span class="row-tag row-tag-rec">Rec</span>{% endif %}
                     {% if club['is_pickup'] %}<span class="row-tag row-tag-pickup">Pick-Up</span>{% endif %}
@@ -132,12 +157,14 @@
     const countEl   = document.getElementById('resultCount');
     const noResults = document.getElementById('noResults');
     const searchEl  = document.getElementById('searchInput');
+    const cityEl    = document.getElementById('citySelect');
+    const sportEl   = document.getElementById('sportSelect');
 
-    let activeCity     = 'all';
-    let activeSport    = 'all';
-    let activeSkill    = 'all';
-    let activePlay     = 'all';
-    let searchQuery    = '';
+    let activeCity  = 'all';
+    let activeSport = 'all';
+    let activeSkill = 'all';
+    let activePlay  = 'all';
+    let searchQuery = '';
 
     function apply() {
         let visible = 0;
@@ -161,6 +188,18 @@
         noResults.style.display = visible === 0 ? 'block' : 'none';
     }
 
+    cityEl.addEventListener('change', () => {
+        activeCity = cityEl.value;
+        cityEl.classList.toggle('active', activeCity !== 'all');
+        apply();
+    });
+
+    sportEl.addEventListener('change', () => {
+        activeSport = sportEl.value;
+        sportEl.classList.toggle('active', activeSport !== 'all');
+        apply();
+    });
+
     function wireFilter(filterAttr, setter) {
         document.querySelectorAll(`[data-filter="${filterAttr}"]`).forEach(btn => {
             btn.addEventListener('click', () => {
@@ -172,8 +211,6 @@
         });
     }
 
-    wireFilter('city',  v => { activeCity  = v; });
-    wireFilter('sport', v => { activeSport = v; });
     wireFilter('skill', v => { activeSkill = v; });
     wireFilter('play',  v => { activePlay  = v; });
 
