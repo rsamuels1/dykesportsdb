@@ -32,7 +32,11 @@ ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_trans_inclusive BOOLEAN NOT NULL D
 -- 6. Lesbian-centered flag (added later)
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS is_lesbian_centered BOOLEAN NOT NULL DEFAULT FALSE;
 
--- 7. Contact / edit-request messages table
+-- 7. SEO slugs (locked at club creation; never auto-changes on rename)
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS slug TEXT;
+-- (App backfills any NULL slugs and creates a unique index on startup.)
+
+-- 8. Contact / edit-request messages table
 CREATE TABLE IF NOT EXISTS contact_messages (
     id           SERIAL PRIMARY KEY,
     name         TEXT NOT NULL,

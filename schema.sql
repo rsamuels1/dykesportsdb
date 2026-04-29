@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 CREATE TABLE IF NOT EXISTS clubs (
     id            SERIAL PRIMARY KEY,
     club_name     TEXT NOT NULL,
+    slug          TEXT UNIQUE,
     sport         TEXT NOT NULL,
     city          TEXT,
     is_comp       BOOLEAN NOT NULL DEFAULT FALSE,

@@ -161,7 +161,7 @@
     <div class="club-list" id="clubGrid">
         {% for club in clubs %}
         {% set emoji = sport_emoji.get(club['sport'].lower(), '🏅') %}
-        <a href="/sports-database/{{ club['id'] }}"
+        <a href="/clubs/{{ club['slug'] or club['id'] }}"
            class="club-row"
            data-sport="{{ club['sport'] }}"
            data-city="{{ club['city'] or '' }}"

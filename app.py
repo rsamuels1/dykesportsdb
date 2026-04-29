@@ -1,4 +1,5 @@
 import os
+import re
 import smtplib
 import uuid
 from email.mime.text import MIMEText
@@ -10,7 +11,7 @@ import psycopg2.extras
 from werkzeug.utils import secure_filename
 
 from dotenv import load_dotenv
-from flask import (Flask, g, jsonify, redirect, render_template,
+from flask import (Flask, Response, g, jsonify, redirect, render_template,
                    request, session, url_for)
 
 load_dotenv()
@@ -60,6 +61,43 @@ SPORT_EMOJI = {
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def slugify(text):
+    text = (text or "").lower().strip()
+    text = re.sub(r"[^a-z0-9]+", "-", text)
+    text = text.strip("-")
+    return text or "club"
+
+
+def generate_unique_slug(cur, base_slug, exclude_id=None):
+    """Return a slug that doesn't collide with any existing row's slug."""
+    slug = base_slug
+    n = 2
+    while True:
+        if exclude_id is not None:
+            cur.execute("SELECT 1 FROM clubs WHERE slug = %s AND id != %s LIMIT 1",
+                        [slug, exclude_id])
+        else:
+            cur.execute("SELECT 1 FROM clubs WHERE slug = %s LIMIT 1", [slug])
+        if cur.fetchone() is None:
+            return slug
+        slug = f"{base_slug}-{n}"
+        n += 1
+
+
+def truncate_meta(text, length=155):
+    if not text:
+        return ""
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= length:
+        return text
+    return text[: length - 1].rsplit(" ", 1)[0] + "…"
+
+
+def site_url():
+    """Absolute base URL for canonical/OG tags. Honors X-Forwarded-Proto."""
+    return request.url_root.rstrip("/")
 
 
 def normalize_database_url(database_url: str) -> str:
@@ -175,6 +213,17 @@ def ensure_db_ready():
         """)
         # Fix the clubs id sequence to prevent duplicate key errors
         cur.execute("SELECT setval('clubs_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM clubs))")
+
+        # SEO: add slug column + backfill any missing slugs
+        cur.execute("ALTER TABLE clubs ADD COLUMN IF NOT EXISTS slug TEXT")
+        cur.execute("SELECT id, club_name FROM clubs WHERE slug IS NULL OR slug = ''")
+        for row in cur.fetchall():
+            club_id, club_name = row
+            base = slugify(club_name)
+            unique = generate_unique_slug(cur, base, exclude_id=club_id)
+            cur.execute("UPDATE clubs SET slug = %s WHERE id = %s", [unique, club_id])
+        cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS clubs_slug_unique ON clubs(slug)")
+
         conn.commit()
         cur.close()
         conn.close()
@@ -208,17 +257,52 @@ def sports_database():
                            sport_emoji=SPORT_EMOJI)
 
 
-@app.route("/sports-database/<int:club_id>")
-def club_detail(club_id):
+@app.route("/clubs/<slug>")
+def club_detail(slug):
     if not ensure_db_ready():
         return "Database unavailable — please try again shortly.", 503
     db = get_db()
     cur = db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cur.execute("SELECT * FROM clubs WHERE id = %s AND status = 'approved'", [club_id])
+    cur.execute("SELECT * FROM clubs WHERE slug = %s AND status = 'approved'", [slug])
     club = cur.fetchone()
     if club is None:
         return "Club not found", 404
-    return render_template("club_detail.html", club=club, sport_emoji=SPORT_EMOJI)
+
+    # SEO meta
+    parts = [club["club_name"]]
+    if club.get("sport"): parts.append(club["sport"])
+    if club.get("city"):  parts.append(club["city"])
+    seo_title = " · ".join(parts) + " · Queer Sports DB"
+
+    desc_bits = [club["club_name"]]
+    if club.get("city"):  desc_bits.append(f"in {club['city']}")
+    if club.get("sport"): desc_bits.append(f"— a queer {club['sport'].lower()} club")
+    fallback_desc = " ".join(desc_bits) + " on Queer Sports DB."
+    seo_description = truncate_meta(club.get("notes")) or fallback_desc
+    canonical = f"{site_url()}/clubs/{club['slug']}"
+
+    return render_template(
+        "club_detail.html",
+        club=club,
+        sport_emoji=SPORT_EMOJI,
+        seo_title=seo_title,
+        seo_description=seo_description,
+        canonical_url=canonical,
+    )
+
+
+@app.route("/sports-database/<int:club_id>")
+def club_detail_legacy(club_id):
+    """301 redirect old numeric URLs to the canonical slug URL."""
+    if not ensure_db_ready():
+        return "Database unavailable — please try again shortly.", 503
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT slug FROM clubs WHERE id = %s AND status = 'approved'", [club_id])
+    row = cur.fetchone()
+    if row and row[0]:
+        return redirect(url_for("club_detail", slug=row[0]), code=301)
+    return "Club not found", 404
 
 
 @app.route("/submit", methods=["GET", "POST"])
@@ -264,12 +348,13 @@ def submit():
                 db = get_db()
                 cur = db.cursor()
                 try:
+                    slug = generate_unique_slug(cur, slugify(club_name))
                     cur.execute(
                         """INSERT INTO clubs
-                           (club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
+                           (club_name, slug, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
                             is_trans_inclusive, is_lesbian_centered, instagram, website, notes, photo_url, status)
-                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
-                        [club_name, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
+                           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending')""",
+                        [club_name, slug, sport, city, is_comp, is_rec, is_pickup, is_league, is_tournament, is_travel,
                          is_trans_inclusive, is_lesbian_centered, instagram, website, notes, photo_url],
                     )
                     db.commit()
@@ -327,6 +412,52 @@ def contact():
     clubs = cur.fetchall()
     return render_template("contact.html", clubs=clubs, error=error, sent=sent,
                            preselect_club_id=preselect_club_id)
+
+
+@app.route("/robots.txt")
+def robots_txt():
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /admin\n"
+        "Disallow: /admin/\n"
+        f"Sitemap: {site_url()}/sitemap.xml\n"
+    )
+    return Response(body, mimetype="text/plain")
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    base = site_url()
+    urls = [
+        (f"{base}/", "weekly"),
+        (f"{base}/sports-database", "daily"),
+        (f"{base}/about.html", "monthly"),
+        (f"{base}/stats.html", "weekly"),
+        (f"{base}/contact", "monthly"),
+        (f"{base}/submit", "monthly"),
+    ]
+    if ensure_db_ready():
+        db = get_db()
+        cur = db.cursor()
+        cur.execute("""SELECT slug, created_at FROM clubs
+                       WHERE status = 'approved' AND slug IS NOT NULL""")
+        for slug, created_at in cur.fetchall():
+            urls.append((f"{base}/clubs/{slug}", "monthly", created_at))
+
+    parts = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for entry in urls:
+        loc = entry[0]
+        changefreq = entry[1]
+        parts.append("<url>")
+        parts.append(f"<loc>{loc}</loc>")
+        parts.append(f"<changefreq>{changefreq}</changefreq>")
+        if len(entry) > 2 and entry[2]:
+            parts.append(f"<lastmod>{entry[2].strftime('%Y-%m-%d')}</lastmod>")
+        parts.append("</url>")
+    parts.append("</urlset>")
+    return Response("\n".join(parts), mimetype="application/xml")
 
 
 @app.route("/api/stats")
