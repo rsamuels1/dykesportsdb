@@ -42,7 +42,7 @@
             '<div class="footer-right">' +
             '<a href="/contact">Contact</a>' +
             '<span class="footer-sep">·</span>' +
-            '<a href="https://github.com/dykesportsdb/" target="_blank">GitHub</a>' +
+            'Inspired by <a href="https://github.com/cheeseburgerworld/" target="_blank">CBDB</a>' +
             '<span class="footer-sep">·</span>' +
             '<a href="/admin">Admin</a>' +
             '<span class="footer-sep">·</span>' +
